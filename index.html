@@ -1,235 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NOVA Web3 Dashboard</title>
+<meta charset="UTF-8">
+<title>NOVA Web3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Font -->
+<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- Web3 -->
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
 <style>
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-y: auto;
   font-family: 'Orbitron', sans-serif;
-  background: radial-gradient(circle at top, #0b1d3a, #02040a);
+  background: #02040a;
   color: #e6f1ff;
 }
 
+/* ====== STAR BACKGROUND ====== */
+#stars, #stars2 {
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  background-repeat: repeat;
+  z-index: -3;
+  animation: moveStars 120s linear infinite;
+}
+
+#stars {
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 100px 80px, #fff, transparent),
+    radial-gradient(1px 1px at 200px 150px, #fff, transparent);
+}
+
+#stars2 {
+  background-image:
+    radial-gradient(1px 1px at 50px 50px, #7df9ff, transparent),
+    radial-gradient(2px 2px at 150px 120px, #7df9ff, transparent);
+  animation-duration: 180s;
+  opacity: 0.6;
+}
+
+@keyframes moveStars {
+  from { transform: translate(0,0); }
+  to { transform: translate(-500px, -500px); }
+}
+
+/* ====== MOON ====== */
+#moon {
+  position: fixed;
+  top: 80px;
+  right: 40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #9aa9c9 60%, #5a6a8a);
+  box-shadow: 0 0 60px rgba(150,180,255,0.5);
+  animation: floatMoon 8s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes floatMoon {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ====== UI ====== */
 header {
-  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 20px;
 }
 
 .logo {
+  color: #00eaff;
   font-size: 28px;
-  color: #00e5ff;
-  letter-spacing: 3px;
 }
 
-button {
-  background: linear-gradient(135deg, #00e5ff, #007bff);
+.btn {
+  background: linear-gradient(135deg, #00eaff, #0077ff);
   border: none;
   color: #000;
   padding: 10px 18px;
-  border-radius: 10px;
-  font-family: inherit;
-  cursor: pointer;
+  border-radius: 12px;
+  font-family: 'Orbitron';
   margin-left: 8px;
-}
-
-button:hover {
-  opacity: 0.85;
 }
 
 .container {
   padding: 20px;
 }
 
+h1 {
+  color: #00eaff;
+}
+
 .card {
-  background: rgba(5, 15, 30, 0.9);
+  background: rgba(10,20,40,0.85);
   border-radius: 16px;
   padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 25px rgba(0,229,255,0.08);
-}
-
-h1, h2 {
-  color: #00e5ff;
-}
-
-.label {
-  color: #7ddfff;
-  font-size: 14px;
-}
-
-.value {
-  margin-bottom: 12px;
-  word-break: break-all;
+  margin-top: 20px;
+  box-shadow: 0 0 30px rgba(0,234,255,0.15);
 }
 
 input {
   width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
   border: none;
-  outline: none;
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  opacity: 0.4;
 }
 </style>
 </head>
 
 <body>
 
+<div id="stars"></div>
+<div id="stars2"></div>
+<div id="moon"></div>
+
 <header>
   <div class="logo">NOVA</div>
   <div>
-    <button onclick="connectWallet()">Connect</button>
-    <button onclick="signWallet()">Sign</button>
+    <button class="btn" onclick="connectWallet()">Connect</button>
+    <button class="btn" onclick="signWallet()">Sign</button>
   </div>
 </header>
 
 <div class="container">
-
   <h1>NOVA Web3 Dashboard</h1>
   <p>Live on-chain data from BSC</p>
 
-  <!-- DASHBOARD -->
   <div class="card">
     <h2>Dashboard</h2>
-
-    <div class="label">Wallet</div>
-    <div class="value" id="wallet">-</div>
-
-    <div class="label">Username</div>
-    <div class="value" id="username">-</div>
-
-    <div class="label">Users</div>
-    <div class="value" id="users">-</div>
-
-    <div class="label">BNB Price (USD)</div>
-    <div class="value" id="price">-</div>
+    <p>Wallet: <span id="wallet">-</span></p>
+    <p>Username: <span id="username">-</span></p>
+    <p>Users: <span id="users">-</span></p>
+    <p>BNB Price (USD): <span id="price">-</span></p>
   </div>
 
-  <!-- REGISTER -->
   <div class="card">
     <h2>Register</h2>
-    <input id="regUsername" placeholder="Username"/>
-    <button onclick="register()">Register</button>
+    <input id="regUsername" placeholder="Username">
+    <button class="btn" onclick="register()">Register</button>
   </div>
 
-  <!-- PURCHASE -->
   <div class="card">
     <h2>Purchase</h2>
-    <input id="amount" placeholder="Amount (BNB)"/>
-    <button onclick="purchase()">Purchase</button>
+    <input id="amount" placeholder="BNB Amount">
+    <button class="btn" onclick="purchase()">Purchase</button>
   </div>
-
 </div>
-
-<footer>
-  NOVA © 2025 — BSC Web3 Platform
-</footer>
 
 <script>
 let web3;
 let account;
 let contract;
 
-// ================= CONFIG =================
-const CONTRACT_ADDRESS = "0xYOUR_CONTRACT_ADDRESS";
-
-const ABI = [
-  {
-    "inputs":[{"internalType":"string","name":"username","type":"string"}],
-    "name":"register",
-    "outputs":[],
-    "stateMutability":"nonpayable",
-    "type":"function"
-  },
-  {
-    "inputs":[],
-    "name":"userCount",
-    "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
-    "stateMutability":"view",
-    "type":"function"
-  },
-  {
-    "inputs":[{"internalType":"address","name":"user","type":"address"}],
-    "name":"getUsername",
-    "outputs":[{"internalType":"string","name":"","type":"string"}],
-    "stateMutability":"view",
-    "type":"function"
-  }
-];
-// =========================================
+/* ====== CHANGE THESE ====== */
+const CONTRACT_ADDRESS = "0xYOUR_CONTRACT";
+const ABI = [ /* ABI HERE */ ];
 
 async function connectWallet() {
   if (!window.ethereum) return alert("Wallet not found");
 
-  web3 = new Web3(window.ethereum);
-  await ethereum.request({ method: "eth_requestAccounts" });
+  await ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: '0x38' }]
+  });
 
-  const accounts = await web3.eth.getAccounts();
+  web3 = new Web3(window.ethereum);
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
   account = accounts[0];
 
-  contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-
   document.getElementById("wallet").innerText = account;
-
+  contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
   loadDashboard();
 }
 
 async function signWallet() {
   if (!account) return alert("Connect wallet first");
-  const msg = "NOVA Web3 Authentication";
-  await web3.eth.personal.sign(msg, account);
-  alert("Signed successfully");
+  await ethereum.request({
+    method: "personal_sign",
+    params: ["NOVA Web3 Login", account]
+  });
+  alert("Signed");
 }
 
 async function loadDashboard() {
-  const count = await contract.methods.userCount().call();
-  const username = await contract.methods.getUsername(account).call();
+  try {
+    const users = await contract.methods.userCount().call();
+    const username = await contract.methods.getUsername(account).call();
+    document.getElementById("users").innerText = users;
+    document.getElementById("username").innerText = username || "-";
+  } catch {}
 
-  document.getElementById("users").innerText = count;
-  document.getElementById("username").innerText = username || "-";
-
-  // simple price fetch
   fetch("https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT")
-    .then(res => res.json())
-    .then(d => document.getElementById("price").innerText = parseFloat(d.price).toFixed(2));
+    .then(r => r.json())
+    .then(d => document.getElementById("price").innerText = Number(d.price).toFixed(2));
 }
 
 async function register() {
-  const username = document.getElementById("regUsername").value;
-  if (!username) return alert("Enter username");
-
-  await contract.methods.register(username).send({ from: account });
+  const u = document.getElementById("regUsername").value;
+  await contract.methods.register(u).send({ from: account });
   loadDashboard();
 }
 
 async function purchase() {
   const amount = document.getElementById("amount").value;
-  if (!amount) return alert("Enter amount");
-
   await web3.eth.sendTransaction({
     from: account,
     to: CONTRACT_ADDRESS,
     value: web3.utils.toWei(amount, "ether")
   });
-
-  alert("Purchase completed");
+  alert("Purchase complete");
 }
 </script>
 
