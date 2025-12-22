@@ -1,213 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>NOVA Web3</title>
+<meta charset="UTF-8" />
+<title>NOVA | Galactic Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- SIMPLE FONT -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;500&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
 <style>
-* { box-sizing: border-box; }
-
 html,body{
   margin:0;
   padding:0;
+  background:#05010d;
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
   overflow-x:hidden;
-  background:#05070c;
-  color:#eaeaea;
-  font-family:'Inter',sans-serif;
-  font-size:13px;
 }
-
-/* ===== STAR BACKGROUND ===== */
-#stars{
+canvas{
   position:fixed;
-  inset:0;
-  background:
-    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
-    radial-gradient(1px 1px at 70% 80%, #7df9ff, transparent),
-    radial-gradient(1px 1px at 50% 50%, #fff, transparent);
-  animation: stars 120s linear infinite;
-  z-index:-5;
-}
-
-@keyframes stars{
-  from{transform:translateY(0);}
-  to{transform:translateY(-600px);}
-}
-
-/* ===== 3D PLANET ===== */
-.planet-wrap{
-  position:fixed;
-  top:80px;
-  right:30px;
-  width:140px;
-  height:140px;
-  perspective:800px;
+  top:0;left:0;
   z-index:-1;
 }
-
-.planet{
-  width:100%;
-  height:100%;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #9fdcff, #1a3a6b 60%, #040b18 100%);
-  box-shadow:
-    inset -20px -20px 40px rgba(0,0,0,0.6),
-    0 0 60px rgba(0,170,255,0.35);
-  animation: spin 18s linear infinite;
-  transform-style:preserve-3d;
+section{
+  min-height:100vh;
+  padding:80px 20px;
+  text-align:center;
 }
-
-.planet::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:50%;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.05),
-      rgba(255,255,255,0.05) 2px,
-      transparent 4px
-    );
-  mix-blend-mode:overlay;
-}
-
-@keyframes spin{
-  from{transform:rotateY(0deg);}
-  to{transform:rotateY(360deg);}
-}
-
-/* ===== HEADER ===== */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px;
-}
-
-.logo{
-  font-weight:500;
-  letter-spacing:2px;
-  color:#8fdcff;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-}
-
-/* ===== BUTTON ===== */
-.btn{
-  padding:8px 14px;
-  border-radius:8px;
+h1{font-size:42px;margin-bottom:10px;}
+button{
+  background:linear-gradient(135deg,#6e00ff,#00c6ff);
   border:none;
-  font-size:12px;
+  color:#fff;
+  padding:14px 26px;
+  border-radius:30px;
+  font-size:14px;
   cursor:pointer;
-  background:linear-gradient(135deg,#6fdcff,#3b7bff);
-  color:#000;
+  margin:10px;
 }
-
-/* ===== CONTENT ===== */
-.container{
-  max-width:480px;
-  margin:auto;
-  padding:20px;
-}
-
-h1{
-  font-size:22px;
-  font-weight:400;
-  color:#8fdcff;
-}
-
-p{opacity:0.7}
-
-/* ===== CARD ===== */
+button:hover{opacity:.85}
 .card{
-  background:rgba(15,25,50,0.7);
-  border-radius:14px;
-  padding:16px;
-  margin-top:18px;
-  box-shadow:0 0 20px rgba(0,150,255,0.12);
-  word-break:break-word;
+  max-width:420px;
+  margin:20px auto;
+  background:rgba(255,255,255,0.06);
+  border-radius:20px;
+  padding:25px;
+  backdrop-filter:blur(10px);
 }
-
-/* ===== INPUT ===== */
 input{
   width:100%;
-  padding:10px;
-  margin-top:8px;
-  border-radius:8px;
+  padding:12px;
+  border-radius:12px;
   border:none;
-  background:#0c1428;
-  color:#fff;
-  font-size:12px;
+  margin:10px 0;
 }
+small{opacity:.7}
 </style>
 </head>
 
 <body>
 
-<div id="stars"></div>
+<canvas id="space"></canvas>
 
-<div class="planet-wrap">
-  <div class="planet"></div>
-</div>
+<section>
+  <h1>NOVA</h1>
+  <p>Galactic Decentralized Platform</p>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="wallet"></p>
+</section>
 
-<header>
-  <div class="logo">NOVA</div>
-  <div class="actions">
-    <button class="btn" onclick="connectWallet()">Connect</button>
-    <button class="btn" onclick="signWallet()">Sign</button>
-  </div>
-</header>
-
-<div class="container">
-  <h1>Web3 Dashboard</h1>
-  <p>BSC on-chain data</p>
-
+<section>
   <div class="card">
-    <div><strong>Wallet</strong><br><span id="wallet">-</span></div>
-    <div><strong>Users</strong>: <span id="users">-</span></div>
+    <h3>Register (2 USDT)</h3>
+    <input id="username" placeholder="username">
+    <button onclick="register()">Register</button>
   </div>
+</section>
 
+<section>
   <div class="card">
-    <strong>Register</strong>
-    <input placeholder="username">
-    <button class="btn" style="margin-top:10px">Register</button>
+    <h3>Purchase (10 USDT)</h3>
+    <input id="ref1" placeholder="referrer 1">
+    <input id="ref2" placeholder="referrer 2">
+    <button onclick="purchase()">Purchase</button>
   </div>
-
-  <div class="card">
-    <strong>Purchase</strong>
-    <input placeholder="BNB amount">
-    <button class="btn" style="margin-top:10px">Buy</button>
-  </div>
-</div>
+</section>
 
 <script>
-let web3,account;
+// ========= SPACE BACKGROUND =========
+const canvas=document.getElementById('space');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+let stars=[...Array(200)].map(()=>({
+ x:Math.random()*canvas.width,
+ y:Math.random()*canvas.height,
+ r:Math.random()*1.5
+}));
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle='white';
+ stars.forEach(s=>{
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+  ctx.fill();
+  s.y+=0.2;
+  if(s.y>canvas.height)s.y=0;
+ });
+ requestAnimationFrame(draw);
+}
+draw();
+
+// ========= WEB3 =========
+let web3, account;
+const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
+const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
+
+const ABI = [
+ {"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"nonpayable","type":"function"},
+ {"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
+
+const ERC20_ABI = [
+ {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}
+];
 
 async function connectWallet(){
-  if(!window.ethereum) return alert("No wallet");
-  await ethereum.request({method:'eth_requestAccounts'});
-  web3=new Web3(window.ethereum);
-  account=(await web3.eth.getAccounts())[0];
-  document.getElementById("wallet").innerText=account;
+ if(window.ethereum){
+   web3=new Web3(window.ethereum);
+   const accs=await ethereum.request({method:'eth_requestAccounts'});
+   account=accs[0];
+   document.getElementById('wallet').innerText=account;
+ }else{
+   alert("Wallet not found");
+ }
 }
 
-async function signWallet(){
-  if(!account) return alert("Connect first");
-  await ethereum.request({
-    method:"personal_sign",
-    params:["NOVA LOGIN",account]
-  });
-  alert("Signed");
+async function approveUSDT(amount){
+ const usdt=new web3.eth.Contract(ERC20_ABI,USDT_ADDRESS);
+ const value=web3.utils.toWei(amount,'ether');
+ return usdt.methods.approve(CONTRACT_ADDRESS,value).send({from:account});
+}
+
+async function register(){
+ const username=document.getElementById('username').value;
+ if(!username) return alert("Username required");
+ await approveUSDT("2");
+ const c=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
+ await c.methods.Register(username).send({from:account});
+ alert("Registered successfully");
+}
+
+async function purchase(){
+ const r1=document.getElementById('ref1').value;
+ const r2=document.getElementById('ref2').value;
+ await approveUSDT("10");
+ const c=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
+ await c.methods.Purchase(r1,r2).send({from:account});
+ alert("Purchase successful");
 }
 </script>
 
