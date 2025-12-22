@@ -5,144 +5,205 @@
 <title>NOVA | Galactic Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-/* ===== RESET ===== */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: Arial, sans-serif;
-}
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 
-/* ===== BODY ===== */
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
 body{
-  min-height:200vh;
-  background:radial-gradient(circle at bottom, #05020a, #000);
+  background:#000;
   color:#fff;
   overflow-x:hidden;
+  min-height:200vh;
 }
 
-/* ===== SPACE BACKGROUND ===== */
-.space{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  z-index:-5;
-}
-
-/* ===== STARS ===== */
+/* ===== SPACE ===== */
+.space{position:fixed;inset:0;z-index:-5}
 .stars{
-  position:absolute;
-  inset:-50%;
+  position:absolute;inset:-50%;
   background:
-    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
     radial-gradient(1px 1px at 70% 80%, #aaa, transparent),
     radial-gradient(1px 1px at 40% 60%, #fff, transparent),
     radial-gradient(1px 1px at 90% 10%, #bbb, transparent);
-  background-size:200px 200px;
-  animation: starMove 120s linear infinite;
-  opacity:0.7;
+  background-size:220px 220px;
+  animation:stars 140s linear infinite;
+  opacity:.6;
 }
+@keyframes stars{from{transform:translateY(0)}to{transform:translateY(1400px)}}
 
-/* ===== MOON ===== */
 .moon{
   position:absolute;
-  width:260px;
-  height:260px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #fff, #aaa 60%, #666 100%);
-  top:15%;
-  left:65%;
-  box-shadow:
-    0 0 60px rgba(255,255,255,0.3),
-    inset -20px -20px 40px rgba(0,0,0,0.6);
-  transition:transform 0.1s linear;
+  width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #fff, #bbb 60%, #666);
+  top:12%;left:60%;
+  box-shadow:0 0 60px rgba(255,255,255,.35),
+             inset -30px -30px 40px rgba(0,0,0,.6);
 }
 
-/* ===== STAR ANIMATION ===== */
-@keyframes starMove{
-  from{transform:translateY(0)}
-  to{transform:translateY(1000px)}
-}
-
-/* ===== CONTENT ===== */
+/* ===== UI ===== */
 .container{
+  max-width:420px;
+  margin:auto;
   padding-top:120px;
   text-align:center;
 }
+h1{font-size:26px;margin-bottom:30px;letter-spacing:2px}
 
-h1{
-  font-size:32px;
-  margin-bottom:30px;
-  letter-spacing:2px;
+.card{
+  background:rgba(10,10,30,.7);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin-bottom:12px;
+  font-size:14px;
 }
 
 button{
-  background:linear-gradient(135deg,#6a5cff,#9f6bff);
+  width:100%;
+  padding:14px;
   border:none;
-  padding:14px 36px;
   border-radius:30px;
+  background:linear-gradient(135deg,#6a5cff,#9f6bff);
   color:#fff;
-  font-size:16px;
+  font-size:15px;
   cursor:pointer;
-  box-shadow:0 10px 30px rgba(120,80,255,0.4);
-  transition:0.3s;
 }
+button:hover{opacity:.9}
 
-button:hover{
-  transform:scale(1.05);
-}
+.addr{font-size:12px;opacity:.7;word-break:break-all}
 
-/* ===== MOBILE ===== */
 @media(max-width:768px){
-  .moon{
-    width:180px;
-    height:180px;
-    left:55%;
-    top:10%;
-  }
-
-  h1{
-    font-size:24px;
-  }
+  .moon{width:180px;height:180px;left:55%}
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== SPACE ===== -->
 <div class="space">
   <div class="stars"></div>
   <div class="moon"></div>
 </div>
 
-<!-- ===== CONTENT ===== -->
 <div class="container">
   <h1>Galactic Decentralized Platform</h1>
-  <button>Connect Wallet</button>
+
+  <button onclick="connect()">Connect Wallet</button>
+  <p id="wallet" class="addr">Not connected</p>
+
+  <div class="card">
+    <h3>Register (2 USDT)</h3>
+    <input id="username" placeholder="username">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <div class="card">
+    <h3>Purchase (10 USDT)</h3>
+    <input id="ref1" placeholder="ref1 username">
+    <input id="ref2" placeholder="ref2 username">
+    <button onclick="purchase()">Purchase</button>
+  </div>
+
+  <div class="card">
+    <h3>User Info</h3>
+    <button onclick="loadInfo()">Load Dashboard</button>
+    <pre id="info" style="font-size:11px;text-align:left;margin-top:10px"></pre>
+  </div>
+
+  <div class="card">
+    <h3>Withdraw</h3>
+    <button onclick="withdraw()">Withdraw</button>
+  </div>
 </div>
 
-<!-- ===== PARALLAX SCRIPT ===== -->
 <script>
-const moon = document.querySelector('.moon');
-const stars = document.querySelector('.stars');
+/* ===== CONFIG ===== */
+const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
+const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"; // BSC USDT
 
-window.addEventListener('mousemove', e => {
-  const x = (e.clientX / window.innerWidth - 0.5) * 30;
-  const y = (e.clientY / window.innerHeight - 0.5) * 30;
+const ABI = [ /* ABI FULL */ 
+{"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+{"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"},
+{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"payable","type":"function"},
+{"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"current","type":"tuple"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Earned","name":"totalEarned","type":"tuple"},{"components":[{"internalType":"uint64","name":"leftCount","type":"uint64"},{"internalType":"uint64","name":"rightCount","type":"uint64"},{"internalType":"uint64","name":"points","type":"uint64"},{"internalType":"uint64","name":"flushes","type":"uint64"}],"internalType":"struct BackBone.Activity","name":"activity","type":"tuple"},{"internalType":"string","name":"notification","type":"string"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
 
-  moon.style.transform = `translate(${x}px, ${y}px)`;
-  stars.style.transform = `translate(${x*2}px, ${y*2}px)`;
+const USDT_ABI = [
+  "function approve(address,uint256) external returns(bool)"
+];
+
+let provider, signer, contract, usdt;
+
+/* ===== CONNECT ===== */
+async function connect(){
+  if(!window.ethereum) return alert("Install MetaMask");
+  await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x38'}]});
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts",[]);
+  signer = provider.getSigner();
+  contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+  usdt = new ethers.Contract(USDT_ADDRESS, USDT_ABI, signer);
+  document.getElementById("wallet").innerText = await signer.getAddress();
+}
+
+/* ===== REGISTER ===== */
+async function register(){
+  await usdt.approve(CONTRACT_ADDRESS, ethers.utils.parseUnits("2",18));
+  const tx = await contract.Register(
+    document.getElementById("username").value,
+    { value: ethers.utils.parseUnits("2",18) }
+  );
+  await tx.wait();
+  alert("Registered");
+}
+
+/* ===== PURCHASE ===== */
+async function purchase(){
+  await usdt.approve(CONTRACT_ADDRESS, ethers.utils.parseUnits("10",18));
+  const tx = await contract.Purchase(
+    document.getElementById("ref1").value,
+    document.getElementById("ref2").value,
+    { value: ethers.utils.parseUnits("10",18) }
+  );
+  await tx.wait();
+  alert("Purchased");
+}
+
+/* ===== DASHBOARD ===== */
+async function loadInfo(){
+  const addr = await signer.getAddress();
+  const data = await contract.UserBulkInfo(addr,true);
+  document.getElementById("info").innerText = JSON.stringify(data,null,2);
+}
+
+/* ===== WITHDRAW ===== */
+async function withdraw(){
+  const tx = await contract.withdraw();
+  await tx.wait();
+  alert("Withdraw done");
+}
+
+/* ===== PARALLAX ===== */
+const moon=document.querySelector('.moon'),stars=document.querySelector('.stars');
+window.addEventListener('mousemove',e=>{
+  const x=(e.clientX/window.innerWidth-.5)*30;
+  const y=(e.clientY/window.innerHeight-.5)*30;
+  moon.style.transform=`translate(${x}px,${y}px)`;
+  stars.style.transform=`translate(${x*2}px,${y*2}px)`;
 });
-
-window.addEventListener('scroll', () => {
-  const scrollY = window.scrollY;
-  moon.style.transform = `translateY(${scrollY * 0.15}px)`;
-  stars.style.transform = `translateY(${scrollY * 0.3}px)`;
+window.addEventListener('scroll',()=>{
+  moon.style.transform=`translateY(${scrollY*.15}px)`;
+  stars.style.transform=`translateY(${scrollY*.3}px)`;
 });
 </script>
-
 </body>
 </html>
