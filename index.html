@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <title>NOVA Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Web3 -->
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -12,201 +12,177 @@
 :root{
   --bg:#0b0f1a;
   --card:#121a2f;
-  --accent:#00f0ff;
-  --text:#e6e6e6;
+  --primary:#4da3ff;
+  --text:#ffffff;
   --muted:#9aa4bf;
 }
-body{
-  margin:0;
-  font-family:Tahoma,Arial;
-  background:var(--bg);
-  color:var(--text);
-}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{margin:0;background:var(--bg);color:var(--text)}
 header{
-  padding:16px;
-  background:#0f1629;
+  padding:20px 30px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  background:rgba(0,0,0,.4);
+  position:sticky;top:0
 }
+.logo{font-size:22px;font-weight:bold;color:var(--primary)}
 button{
-  background:var(--accent);
+  background:var(--primary);
   border:none;
-  padding:10px 16px;
-  border-radius:8px;
+  padding:10px 18px;
+  border-radius:6px;
+  color:#000;
   font-weight:bold;
-  cursor:pointer;
+  cursor:pointer
 }
-.container{
-  padding:16px;
+.container{padding:40px 20px;max-width:1200px;margin:auto}
+.hero{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+  text-align:center;
+  padding:60px 20px
+}
+.hero h1{font-size:42px}
+.hero p{color:var(--muted);max-width:600px;margin:auto}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  margin-top:40px
 }
 .card{
   background:var(--card);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
+  padding:20px;
+  border-radius:12px;
 }
-h2{margin-top:0}
-.value{color:var(--accent);font-weight:bold}
-.lang{
-  background:none;
-  color:var(--text);
-  border:1px solid var(--accent);
-  margin-left:8px;
-}
-.hidden{display:none}
-table{
+input{
   width:100%;
-  border-collapse:collapse;
+  padding:10px;
+  margin-top:8px;
+  border-radius:6px;
+  border:none
 }
-td,th{
-  padding:8px;
-  border-bottom:1px solid #222;
-  text-align:left;
+.footer{
+  margin-top:60px;
+  padding:20px;
+  text-align:center;
+  color:var(--muted)
 }
+a{color:var(--primary);text-decoration:none}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div>🚀 <b>NOVA PLATFORM</b></div>
-  <div>
-    <button class="lang" onclick="setLang('fa')">FA</button>
-    <button class="lang" onclick="setLang('en')">EN</button>
-    <button onclick="connectWallet()">Connect Wallet</button>
-  </div>
+  <div class="logo">NOVA</div>
+  <button onclick="connectWallet()">Connect Wallet</button>
 </header>
+
+<section class="hero">
+  <h1>NOVA Smart Reward Platform</h1>
+  <p>Decentralized binary reward ecosystem on BSC with transparent smart contracts.</p>
+</section>
 
 <div class="container">
 
-<!-- USER DASHBOARD -->
-<div class="card">
-  <h2 id="t_dashboard">داشبورد کاربر</h2>
-  <p>Wallet: <span id="wallet" class="value">-</span></p>
-  <p>User Count: <span id="userCount" class="value">-</span></p>
+  <div class="cards">
+    <div class="card">
+      <h3>Wallet</h3>
+      <p id="wallet">Not connected</p>
+    </div>
+
+    <div class="card">
+      <h3>User Info</h3>
+      <p id="username">-</p>
+      <p id="balance">-</p>
+    </div>
+  </div>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Register</h3>
+      <input id="regUser" placeholder="Username">
+      <button onclick="register()">Register</button>
+    </div>
+
+    <div class="card">
+      <h3>Purchase</h3>
+      <input id="ref1" placeholder="Ref 1 Username">
+      <input id="ref2" placeholder="Ref 2 Username">
+      <button onclick="purchase()">Purchase</button>
+    </div>
+
+    <div class="card">
+      <h3>Withdraw</h3>
+      <button onclick="withdraw()">Withdraw Rewards</button>
+    </div>
+
+  </div>
+
 </div>
 
-<!-- LEADERBOARD -->
-<div class="card">
-  <h2 id="t_leaderboard">🏆 لیدربورد</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>UserID</th>
-        <th>UNI</th>
-        <th>BI</th>
-      </tr>
-    </thead>
-    <tbody id="leaderboard">
-      <tr><td colspan="4">Loading...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ADMIN PANEL -->
-<div class="card hidden" id="adminPanel">
-  <h2>🔐 Admin Panel</h2>
-  <p>Total Users: <span id="adminUserCount" class="value">-</span></p>
-</div>
-
+<div class="footer">
+  © 2025 NOVA | <a href="https://t.me/Novacompany_bot">Telegram Bot</a>
 </div>
 
 <script>
-// ================= CONFIG =================
-const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-const ADMIN_WALLET = "PUT_ADMIN_WALLET_HERE"; // <-- بعداً آدرس خودت
-const TELEGRAM_BOT_TOKEN = "8453158537:AAFbEyrj967B55LZn5IFdhcXA5fA7bmUS4Y";
-const TELEGRAM_CHAT_ID = "@Novacompany_bot";
+let web3;
+let account;
+const contractAddress = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
 
-// ABI (خلاصه‌شده برای فاز 1)
 const ABI = [
- {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"idToTotalEarned","outputs":[
-   {"internalType":"uint256","name":"uniUsd","type":"uint256"},
-   {"internalType":"uint256","name":"biUsd","type":"uint256"},
-   {"internalType":"uint256","name":"vou","type":"uint256"},
-   {"internalType":"uint256","name":"mileUsd","type":"uint256"}
- ],"stateMutability":"view","type":"function"}
+  {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
 ];
 
-let web3, contract, currentAccount=null;
-let LANG="fa";
+let contract;
 
-// ================= LANG =================
-const TEXT={
- fa:{
-  dashboard:"داشبورد کاربر",
-  leaderboard:"لیدربورد"
- },
- en:{
-  dashboard:"User Dashboard",
-  leaderboard:"Leaderboard"
- }
-};
-function setLang(l){
- LANG=l;
- document.getElementById("t_dashboard").innerText=TEXT[l].dashboard;
- document.getElementById("t_leaderboard").innerText=TEXT[l].leaderboard;
-}
-
-// ================= WALLET =================
 async function connectWallet(){
- if(!window.ethereum){
-   alert("Wallet not found (SafePal / MetaMask)");
-   return;
- }
- web3=new Web3(window.ethereum);
- const accs=await ethereum.request({method:"eth_requestAccounts"});
- currentAccount=accs[0];
- document.getElementById("wallet").innerText=currentAccount;
- contract=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
-
- if(currentAccount.toLowerCase()===ADMIN_WALLET.toLowerCase()){
-   document.getElementById("adminPanel").classList.remove("hidden");
- }
-
- notifyTelegram("Wallet Connected:\n"+currentAccount);
- loadData();
+  if(window.ethereum){
+    web3 = new Web3(window.ethereum);
+    const accs = await ethereum.request({method:'eth_requestAccounts'});
+    account = accs[0];
+    document.getElementById("wallet").innerText = account;
+    contract = new web3.eth.Contract(ABI, contractAddress);
+    loadUser();
+  } else {
+    alert("Please open in SafePal or MetaMask browser");
+  }
 }
 
-// ================= LOAD DATA =================
-async function loadData(){
- const count=await contract.methods.UserCount().call();
- document.getElementById("userCount").innerText=count;
- document.getElementById("adminUserCount").innerText=count;
-
- loadLeaderboard(count);
+async function loadUser(){
+  const data = await contract.methods.UserBulkInfo(account,false).call();
+  document.getElementById("username").innerText = "Username: " + data.username;
+  document.getElementById("balance").innerText =
+    "Rewards: " + web3.utils.fromWei(data.latest.biUsd,"ether") + " USD";
 }
 
-// ================= LEADERBOARD =================
-async function loadLeaderboard(count){
- let tbody=document.getElementById("leaderboard");
- tbody.innerHTML="";
- let limit=Math.min(count,5);
- for(let i=1;i<=limit;i++){
-   let e=await contract.methods.idToTotalEarned(i).call();
-   let tr=document.createElement("tr");
-   tr.innerHTML=`
-    <td>${i}</td>
-    <td>${i}</td>
-    <td>${e.uniUsd}</td>
-    <td>${e.biUsd}</td>`;
-   tbody.appendChild(tr);
- }
+async function register(){
+  const u = document.getElementById("regUser").value;
+  await contract.methods.Register(u).send({
+    from:account,
+    value:web3.utils.toWei("2","ether")
+  });
 }
 
-// ================= TELEGRAM =================
-function notifyTelegram(msg){
- fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    chat_id:TELEGRAM_CHAT_ID,
-    text:"🚀 NOVA PLATFORM\n"+msg
-  })
- });
+async function purchase(){
+  const r1=document.getElementById("ref1").value;
+  const r2=document.getElementById("ref2").value;
+  await contract.methods.Purchase(r1,r2).send({
+    from:account,
+    value:web3.utils.toWei("10","ether")
+  });
+}
+
+async function withdraw(){
+  await contract.methods.withdraw().send({from:account});
 }
 </script>
 
