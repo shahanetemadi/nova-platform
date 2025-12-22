@@ -5,14 +5,21 @@ let provider, signer, userAddress;
 
 async function connectWallet() {
   try {
-    if (typeof window.ethereum === "undefined") {
-      alert("❌ لطفاً سایت را فقط از داخل SafePal (Discover) باز کنید");
+    let ethProvider = null;
+
+    if (window.ethereum) {
+      ethProvider = window.ethereum;
+    } else if (window.safepal && window.safepal.ethereum) {
+      ethProvider = window.safepal.ethereum;
+    } else if (window.BinanceChain) {
+      ethProvider = window.BinanceChain;
+    } else {
+      alert("❌ لطفاً سایت را فقط از داخل SafePal → Discover باز کنید");
       return;
     }
 
-    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    provider = new ethers.providers.Web3Provider(ethProvider, "any");
 
-    // درخواست اتصال
     await provider.send("eth_requestAccounts", []);
 
     signer = provider.getSigner();
@@ -21,10 +28,11 @@ async function connectWallet() {
     document.getElementById("walletStatus").innerText =
       "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
 
-    console.log("Connected:", userAddress);
-  } catch (err) {
-    console.error(err);
-    alert("❌ اتصال انجام نشد، یک بار صفحه را رفرش کنید");
+    console.log("Wallet Connected:", userAddress);
+
+  } catch (e) {
+    console.error(e);
+    alert("❌ اتصال رد شد یا کنسل شد");
   }
 }
 </script>
