@@ -1,187 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>Galactic DApp</title>
+<title>BNB Register & Purchase</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:#05060c;
-  color:#fff;
-  font-family:system-ui,Segoe UI,Arial;
-  overflow-x:hidden;
+body {
+  background: radial-gradient(circle at bottom, #020111, #000);
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
-
-/* ===== SPACE ===== */
-.space{
-  position:fixed;
-  inset:0;
-  z-index:-10;
-  perspective:800px;
+.box {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 16px;
+  width: 320px;
+  text-align: center;
 }
-.stars{
-  position:absolute;
-  inset:-100%;
-  background:
-    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
-    radial-gradient(1px 1px at 70% 80%, #aaa, transparent),
-    radial-gradient(1px 1px at 40% 60%, #fff, transparent),
-    radial-gradient(1px 1px at 90% 10%, #bbb, transparent);
-  background-size:240px 240px;
-  animation:stars 160s linear infinite;
-  opacity:.55;
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
-@keyframes stars{
-  from{transform:translateY(0)}
-  to{transform:translateY(1600px)}
-}
-
-/* ===== 3D PLANET ===== */
-.planet-wrap{
-  position:absolute;
-  top:8%;
-  left:55%;
-  width:220px;
-  height:220px;
-  transform-style:preserve-3d;
-}
-.planet{
-  width:100%;
-  height:100%;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #fff, #cfcfcf 45%, #7a7a7a 70%);
-  box-shadow:
-    inset -40px -40px 60px rgba(0,0,0,.7),
-    0 0 80px rgba(255,255,255,.25);
-  animation:spin 18s linear infinite;
-}
-@keyframes spin{
-  from{transform:rotateY(0deg)}
-  to{transform:rotateY(360deg)}
-}
-
-/* ===== UI ===== */
-.container{
-  max-width:380px;
-  margin:auto;
-  padding:110px 16px 80px;
-  text-align:center;
-}
-
-h1{
-  font-size:22px;
-  font-weight:600;
-  letter-spacing:1.2px;
-  margin-bottom:24px;
-  opacity:.9;
-}
-
-.card{
-  background:rgba(15,18,40,.75);
-  backdrop-filter:blur(10px);
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,.55);
-}
-
-input{
-  width:100%;
-  padding:11px 14px;
-  border-radius:12px;
-  border:none;
-  margin-bottom:10px;
-  font-size:13px;
-}
-
-button{
-  width:100%;
-  padding:13px;
-  border:none;
-  border-radius:28px;
-  background:linear-gradient(135deg,#6f63ff,#9f7bff);
-  color:#fff;
-  font-size:14px;
-  cursor:pointer;
-}
-button:active{transform:scale(.98)}
-
-.addr{
-  font-size:11px;
-  opacity:.65;
-  margin:8px 0 18px;
-  word-break:break-all;
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:480px){
-  .planet-wrap{
-    width:170px;
-    height:170px;
-    left:52%;
-  }
-}
+.connect { background: #f3ba2f; color:#000; }
+.reg { background: #4caf50; color:#fff; }
+.buy { background: #2196f3; color:#fff; }
+.status { margin-top: 15px; font-size: 14px; opacity: .9; }
 </style>
 </head>
 
 <body>
 
-<div class="space">
-  <div class="stars"></div>
-  <div class="planet-wrap">
-    <div class="planet"></div>
-  </div>
-</div>
+<div class="box">
+  <h2>BNB Moon System 🌙</h2>
 
-<div class="container">
-  <h1>Galactic Decentralized Platform</h1>
+  <button class="connect" onclick="connectWallet()">Connect Wallet</button>
+  <button class="reg" onclick="register()">Register (2$ BNB)</button>
+  <button class="buy" onclick="purchase()">Purchase (10$ BNB)</button>
 
-  <button onclick="connect()">Connect Wallet</button>
-  <div id="wallet" class="addr">Not connected</div>
-
-  <div class="card">
-    <b style="font-size:13px">Register (2 USDT)</b><br><br>
-    <input id="username" placeholder="username">
-    <button onclick="register()">Register</button>
-  </div>
-
-  <div class="card">
-    <b style="font-size:13px">Purchase (10 USDT)</b><br><br>
-    <input id="ref1" placeholder="ref1 username">
-    <input id="ref2" placeholder="ref2 username">
-    <button onclick="purchase()">Purchase</button>
-  </div>
-
-  <div class="card">
-    <button onclick="loadInfo()">User Info</button>
-    <pre id="info" style="font-size:10px;text-align:left;margin-top:10px"></pre>
-  </div>
-
-  <div class="card">
-    <button onclick="withdraw()">Withdraw</button>
-  </div>
+  <div class="status" id="status">Wallet not connected</div>
 </div>
 
 <script>
-/* ===== PARALLAX ===== */
-const planet=document.querySelector('.planet-wrap');
-const stars=document.querySelector('.stars');
+const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
+const BNB_USD_FEED = "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE"; // Chainlink BNB/USD
 
-window.addEventListener('mousemove',e=>{
-  const x=(e.clientX/window.innerWidth-.5)*25;
-  const y=(e.clientY/window.innerHeight-.5)*25;
-  planet.style.transform=`translate(${x}px,${y}px)`;
-  stars.style.transform=`translate(${x*2}px,${y*2}px)`;
-});
-window.addEventListener('scroll',()=>{
-  planet.style.transform=`translateY(${scrollY*.12}px)`;
-  stars.style.transform=`translateY(${scrollY*.28}px)`;
-});
+const CONTRACT_ABI = [
+  "function Register(string username) payable",
+  "function Purchase(string refer1, string refer2) payable"
+];
+
+const PRICE_ABI = [
+  "function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)"
+];
+
+let provider, signer, contract;
+
+async function connectWallet() {
+  if (!window.ethereum) return alert("MetaMask نصب نیست");
+
+  await ethereum.request({ method: "eth_requestAccounts" });
+  provider = new ethers.BrowserProvider(window.ethereum);
+  signer = await provider.getSigner();
+
+  const network = await provider.getNetwork();
+  if (network.chainId !== 56n) {
+    alert("لطفا شبکه را روی BNB Chain قرار دهید");
+    return;
+  }
+
+  contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+  document.getElementById("status").innerText = "Wallet connected ✅";
+}
+
+async function getBNBAmount(usd) {
+  const priceFeed = new ethers.Contract(BNB_USD_FEED, PRICE_ABI, provider);
+  const data = await priceFeed.latestRoundData();
+  const price = Number(data[1]) / 1e8; // BNB price in USD
+  const bnb = usd / price;
+  return ethers.parseEther(bnb.toFixed(6));
+}
+
+async function register() {
+  const username = prompt("Username:");
+  if (!username) return;
+
+  const value = await getBNBAmount(2);
+  const tx = await contract.Register(username, { value });
+  document.getElementById("status").innerText = "Register tx sent...";
+  await tx.wait();
+  document.getElementById("status").innerText = "Registered successfully ✅";
+}
+
+async function purchase() {
+  const ref1 = prompt("Ref 1 username:");
+  const ref2 = prompt("Ref 2 username:");
+
+  const value = await getBNBAmount(10);
+  const tx = await contract.Purchase(ref1 || "", ref2 || "", { value });
+  document.getElementById("status").innerText = "Purchase tx sent...";
+  await tx.wait();
+  document.getElementById("status").innerText = "Purchase successful 🚀";
+}
 </script>
 
 </body>
