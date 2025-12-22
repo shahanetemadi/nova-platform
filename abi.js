@@ -1,6 +1,17 @@
 // abi.js
 const ABI = [
-  {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {
+    "inputs":[
+      {
+        "internalType":"contract IOrigin",
+        "name":"_origin",
+        "type":"address"
+      }
+    ],
+    "stateMutability":"nonpayable",
+    "type":"constructor"
+  },
+
   {"inputs":[],"name":"AlreadyPurchased","type":"error"},
   {"inputs":[],"name":"AlreadyRegistered","type":"error"},
   {"inputs":[],"name":"AlreadyWithdrawn","type":"error"},
@@ -16,21 +27,31 @@ const ABI = [
   {"inputs":[],"name":"Terminated","type":"error"},
 
   {
-    "inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],
+    "inputs":[
+      {"internalType":"string","name":"refer1","type":"string"},
+      {"internalType":"string","name":"refer2","type":"string"}
+    ],
     "name":"Purchase",
     "outputs":[],
     "stateMutability":"payable",
     "type":"function"
   },
+
   {
-    "inputs":[{"internalType":"string","name":"username","type":"string"}],
+    "inputs":[
+      {"internalType":"string","name":"username","type":"string"}
+    ],
     "name":"Register",
     "outputs":[],
     "stateMutability":"payable",
     "type":"function"
   },
+
   {
-    "inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],
+    "inputs":[
+      {"internalType":"address","name":"userAddr","type":"address"},
+      {"internalType":"bool","name":"showNotifications","type":"bool"}
+    ],
     "name":"UserBulkInfo",
     "outputs":[
       {"internalType":"string","name":"username","type":"string"},
@@ -50,8 +71,21 @@ const ABI = [
     "type":"function"
   },
 
-  {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
+  {
+    "inputs":[],
+    "name":"UserCount",
+    "outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],
+    "stateMutability":"view",
+    "type":"function"
+  },
+
+  {
+    "inputs":[],
+    "name":"withdraw",
+    "outputs":[],
+    "stateMutability":"nonpayable",
+    "type":"function"
+  }
 ];
 
 export default ABI;
