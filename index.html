@@ -5,16 +5,15 @@
 <title>NOVA Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ethers -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<!-- ethers (SafePal compatible) -->
+<script defer src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
 body {
   margin:0;
-  font-family: 'Orbitron', Arial, sans-serif;
+  font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #0b1a3a, #000);
   color:#fff;
-  overflow-x:hidden;
 }
 
 header {
@@ -25,7 +24,7 @@ header {
 }
 
 .logo {
-  font-size:24px;
+  font-size:22px;
   letter-spacing:2px;
   color:#00e5ff;
 }
@@ -38,7 +37,6 @@ button {
   background:linear-gradient(135deg,#00e5ff,#4facfe);
   color:#000;
   cursor:pointer;
-  box-shadow:0 0 20px rgba(0,229,255,0.4);
 }
 
 section {
@@ -51,25 +49,13 @@ section {
   padding:40px 20px;
 }
 
-h1 {
-  font-size:48px;
-  margin-bottom:20px;
-}
-
-p {
-  max-width:600px;
-  opacity:0.85;
-  line-height:1.6;
-}
-
 .card {
-  background:rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.06);
   border-radius:16px;
   padding:30px;
   margin-top:30px;
   width:100%;
-  max-width:500px;
-  box-shadow:0 0 30px rgba(0,229,255,0.15);
+  max-width:420px;
 }
 
 .status {
@@ -88,10 +74,7 @@ p {
 
 <section>
   <h1>The Future of Web3</h1>
-  <p>
-    NOVA is a decentralized galaxy-powered platform combining Web3,
-    AI structures and binary genealogy on BSC.
-  </p>
+  <p>NOVA is a decentralized galaxy-powered platform on BSC.</p>
 
   <div class="card">
     <button onclick="signWallet()">Sign Wallet</button>
@@ -107,17 +90,33 @@ let provider, signer, contract;
 const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
 
 const ABI = [
-  {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-  {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"}
+  {
+    "inputs":[],
+    "name":"UserCount",
+    "outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],
+    "stateMutability":"view",
+    "type":"function"
+  }
 ];
+
+function getEthereum() {
+  if (window.ethereum) return window.ethereum;
+  if (window.safepal && window.safepal.ethereum) return window.safepal.ethereum;
+  return null;
+}
 
 async function connectWallet() {
   try {
-    let eth = null;
+    if (!window.ethers) {
+      alert("ethers not loaded yet, refresh page");
+      return;
+    }
 
-    if (window.ethereum) eth = window.ethereum;
-    else if (window.safepal && window.safepal.ethereum) eth = window.safepal.ethereum;
-    else return alert("Wallet not found");
+    const eth = getEthereum();
+    if (!eth) {
+      alert("Wallet not found");
+      return;
+    }
 
     await eth.request({ method: "eth_requestAccounts" });
 
@@ -137,11 +136,19 @@ async function connectWallet() {
 }
 
 async function signWallet() {
-  if (!signer) return alert("Connect wallet first");
+  try {
+    if (!signer) {
+      alert("Connect wallet first");
+      return;
+    }
 
-  const message = "NOVA activation signature";
-  const sig = await signer.signMessage(message);
-  document.getElementById("signature").innerText = "Signature: " + sig;
+    const message = "NOVA activation signature";
+    const sig = await signer.signMessage(message);
+    document.getElementById("signature").innerText = "Signature: " + sig;
+
+  } catch (e) {
+    alert(e.message);
+  }
 }
 </script>
 
