@@ -33,11 +33,17 @@ const ABI = [
     "name":"UserBulkInfo",
     "outputs":[
       {"internalType":"string","name":"username","type":"string"},
-      {"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"},
-      {"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"current","type":"tuple"},
-      {"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Earned","name":"totalEarned","type":"tuple"},
-      {"components":[{"internalType":"uint64","name":"leftCount","type":"uint64"},{"internalType":"uint64","name":"rightCount","type":"uint64"},{"internalType":"uint64","name":"points","type":"uint64"},{"internalType":"uint64","name":"flushes","type":"uint64"}],"internalType":"struct BackBone.Activity","name":"activity","type":"tuple"},
-      {"internalType":"string","name":"notification","type":"string"}
+      {
+        "components":[
+          {"internalType":"uint256","name":"uniUsd","type":"uint256"},
+          {"internalType":"uint256","name":"biUsd","type":"uint256"},
+          {"internalType":"uint256","name":"vou","type":"uint256"},
+          {"internalType":"uint256","name":"mileUsd","type":"uint256"}
+        ],
+        "internalType":"struct BackBone.Balance",
+        "name":"latest",
+        "type":"tuple"
+      }
     ],
     "stateMutability":"view",
     "type":"function"
