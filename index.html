@@ -1,26 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>NOVA Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Nova Platform</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding:20px; }
+    button { margin:5px; padding:10px; }
+    input { margin:5px; padding:5px; }
+  </style>
 </head>
 <body>
 
-  <div class="app">
-    <h1>NOVA Platform</h1>
-    <p id="status">Wallet not connected</p>
+<h2>Nova Platform – FINAL</h2>
 
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <button onclick="readContract()">Read Contract</button>
+<button onclick="connect()">Connect Wallet</button>
 
-    <pre id="output"></pre>
-  </div>
+<hr>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <script src="config.js"></script>
-  <script src="abi.js"></script>
-  <script src="app.js"></script>
+<input id="username" placeholder="username">
+<input id="regEth" placeholder="ETH">
+<button onclick="register()">Register</button>
+
+<hr>
+
+<input id="ref1" placeholder="ref1">
+<input id="ref2" placeholder="ref2">
+<input id="buyEth" placeholder="ETH">
+<button onclick="purchase()">Purchase</button>
+
+<hr>
+
+<button onclick="withdraw()">Withdraw</button>
+<button onclick="count()">User Count</button>
+
+<p id="out"></p>
+
+<script type="module">
+  import {
+    connectWallet,
+    register as reg,
+    purchase as buy,
+    withdraw as wd,
+    userCount
+  } from "./contract.js";
+
+  window.connect = async () => {
+    await connectWallet();
+    alert("Connected");
+  };
+
+  window.register = async () => {
+    await reg(
+      document.getElementById("username").value,
+      document.getElementById("regEth").value
+    );
+    alert("Registered");
+  };
+
+  window.purchase = async () => {
+    await buy(
+      document.getElementById("ref1").value,
+      document.getElementById("ref2").value,
+      document.getElementById("buyEth").value
+    );
+    alert("Purchased");
+  };
+
+  window.withdraw = async () => {
+    await wd();
+    alert("Withdraw done");
+  };
+
+  window.count = async () => {
+    const c = await userCount();
+    document.getElementById("out").innerText = "Users: " + c;
+  };
+</script>
+
 </body>
 </html>
