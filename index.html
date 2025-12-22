@@ -2,66 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NOVA Platform</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA | Web3 Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- ethers (SafePal compatible) -->
-<script defer src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Vazirmatn:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
-body {
+body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top, #0b1a3a, #000);
+  font-family:Orbitron,Vazirmatn,sans-serif;
+  background:radial-gradient(circle at top,#0b1d3a,#020617);
   color:#fff;
 }
-
-header {
+header{
   padding:20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-
-.logo {
-  font-size:22px;
-  letter-spacing:2px;
-  color:#00e5ff;
-}
-
-button {
-  padding:12px 22px;
-  font-size:16px;
+.logo{color:#00f0ff;font-size:22px;letter-spacing:3px}
+button{
+  background:linear-gradient(135deg,#00f0ff,#0066ff);
   border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,#00e5ff,#4facfe);
-  color:#000;
+  padding:10px 18px;
+  border-radius:14px;
+  color:#fff;
   cursor:pointer;
 }
-
-section {
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:40px 20px;
-}
-
-.card {
-  background:rgba(255,255,255,0.06);
-  border-radius:16px;
-  padding:30px;
-  margin-top:30px;
+input{
   width:100%;
-  max-width:420px;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin-bottom:10px;
 }
-
-.status {
-  margin-top:15px;
-  word-break:break-all;
+section{padding:30px}
+.card{
+  background:#030712;
+  border-radius:20px;
+  padding:25px;
+  margin-bottom:20px;
 }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+}
+.stat{background:#020617;border-radius:16px;padding:15px}
+.stat h4{color:#00f0ff;margin:0}
+small{color:#9ca3af}
 </style>
 </head>
 
@@ -69,86 +59,103 @@ section {
 
 <header>
   <div class="logo">NOVA</div>
-  <button onclick="connectWallet()">Connect Wallet</button>
+  <div>
+    <button onclick="connectWallet()">Connect</button>
+    <button onclick="signWallet()">Sign</button>
+  </div>
 </header>
 
 <section>
-  <h1>The Future of Web3</h1>
-  <p>NOVA is a decentralized galaxy-powered platform on BSC.</p>
+  <h2>NOVA Web3 Dashboard</h2>
+  <p>Live on-chain data from BSC</p>
+</section>
 
-  <div class="card">
-    <button onclick="signWallet()">Sign Wallet</button>
-    <div id="wallet" class="status">Wallet: Not connected</div>
-    <div id="signature" class="status"></div>
-    <div id="users" class="status"></div>
+<!-- DASHBOARD -->
+<section class="card">
+  <h3>Dashboard</h3><br>
+  <div class="grid">
+    <div class="stat"><h4>Wallet</h4><small id="wallet">-</small></div>
+    <div class="stat"><h4>Username</h4><small id="username">-</small></div>
+    <div class="stat"><h4>Users</h4><small id="users">-</small></div>
+    <div class="stat"><h4>UNI USD</h4><small id="uni">-</small></div>
+    <div class="stat"><h4>BI USD</h4><small id="bi">-</small></div>
+    <div class="stat"><h4>Voucher</h4><small id="vou">-</small></div>
+    <div class="stat"><h4>Mile USD</h4><small id="mile">-</small></div>
   </div>
 </section>
 
+<!-- REGISTER -->
+<section class="card">
+  <h3>Register</h3><br>
+  <input id="regUsername" placeholder="Username">
+  <button onclick="registerUser()">Register</button>
+</section>
+
+<!-- PURCHASE -->
+<section class="card">
+  <h3>Purchase</h3><br>
+  <input id="ref1" placeholder="Refer 1 Username">
+  <input id="ref2" placeholder="Refer 2 Username">
+  <button onclick="purchase()">Purchase</button>
+</section>
+
 <script>
-let provider, signer, contract;
-
-const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-
-const ABI = [
-  {
-    "inputs":[],
-    "name":"UserCount",
-    "outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],
-    "stateMutability":"view",
-    "type":"function"
-  }
+/* ---------- CONFIG ---------- */
+const CONTRACT="0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
+const ABI=[
+{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"payable","type":"function"},
+{"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"},
+{"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"}],"stateMutability":"view","type":"function"},
+{"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-function getEthereum() {
-  if (window.ethereum) return window.ethereum;
-  if (window.safepal && window.safepal.ethereum) return window.safepal.ethereum;
-  return null;
+let provider,signer,contract;
+
+/* ---------- WALLET ---------- */
+async function connectWallet(){
+  provider=new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts",[]);
+  signer=provider.getSigner();
+  contract=new ethers.Contract(CONTRACT,ABI,signer);
+  wallet.innerText=await signer.getAddress();
+  loadDashboard();
 }
 
-async function connectWallet() {
-  try {
-    if (!window.ethers) {
-      alert("ethers not loaded yet, refresh page");
-      return;
-    }
-
-    const eth = getEthereum();
-    if (!eth) {
-      alert("Wallet not found");
-      return;
-    }
-
-    await eth.request({ method: "eth_requestAccounts" });
-
-    provider = new ethers.providers.Web3Provider(eth);
-    signer = provider.getSigner();
-
-    const address = await signer.getAddress();
-    document.getElementById("wallet").innerText = "Wallet: " + address;
-
-    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-    const count = await contract.UserCount();
-    document.getElementById("users").innerText = "User Count: " + count;
-
-  } catch (e) {
-    alert(e.message);
-  }
+async function signWallet(){
+  if(!signer) return alert("Connect wallet first");
+  await signer.signMessage("NOVA AUTH");
 }
 
-async function signWallet() {
-  try {
-    if (!signer) {
-      alert("Connect wallet first");
-      return;
-    }
+/* ---------- DASHBOARD ---------- */
+async function loadDashboard(){
+  const addr=await signer.getAddress();
+  const info=await contract.UserBulkInfo(addr,false);
+  username.innerText=info.username||"-";
+  uni.innerText=ethers.utils.formatUnits(info.latest.uniUsd,18);
+  bi.innerText=ethers.utils.formatUnits(info.latest.biUsd,18);
+  vou.innerText=info.latest.vou;
+  mile.innerText=ethers.utils.formatUnits(info.latest.mileUsd,18);
+  users.innerText=(await contract.UserCount()).toString();
+}
 
-    const message = "NOVA activation signature";
-    const sig = await signer.signMessage(message);
-    document.getElementById("signature").innerText = "Signature: " + sig;
+/* ---------- REGISTER ---------- */
+async function registerUser(){
+  const u=regUsername.value.trim();
+  if(!u) return alert("Username required");
+  const tx=await contract.Register(u,{value:ethers.utils.parseEther("0.01")});
+  await tx.wait();
+  alert("Registered!");
+  loadDashboard();
+}
 
-  } catch (e) {
-    alert(e.message);
-  }
+/* ---------- PURCHASE ---------- */
+async function purchase(){
+  const r1=ref1.value.trim();
+  const r2=ref2.value.trim();
+  const tx=await contract.Purchase(r1,r2,{value:ethers.utils.parseEther("0.01")});
+  await tx.wait();
+  alert("Purchase successful!");
+  loadDashboard();
 }
 </script>
 
