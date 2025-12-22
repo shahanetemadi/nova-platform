@@ -1,99 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Nova Platform</title>
+<meta charset="UTF-8">
+<title>Nova Platform FINAL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<!-- Ethers.js -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<style>
+  body { font-family: Arial,sans-serif; padding:20px; }
+  button { padding:10px; margin:8px 0; }
+  input { padding:6px; margin:5px 0; width:calc(100% - 14px); }
+  .info { font-size:14px; margin:4px 0; color:green; }
+</style>
 </head>
-
 <body>
 
 <h2>Nova Platform – FINAL</h2>
 
-<button onclick="connectWallet(<script>
-const CONTRACT_ADDRESS = "0xYOUR_CONTRACT_ADDRESS_HERE";
+<button onclick="connectWallet()">Connect Wallet</button>
+<div id="walletInfo" class="info"></div>
 
+<hr>
+
+<input id="inpUsername" placeholder="Username">
+<input id="inpRegETH" placeholder="ETH Value for Register">
+<button onclick="registerUser()">Register</button>
+
+<hr>
+
+<input id="inpRef1" placeholder="ref1">
+<input id="inpRef2" placeholder="ref2">
+<input id="inpPurETH" placeholder="ETH Value for Purchase">
+<button onclick="purchaseUser()">Purchase</button>
+
+<hr>
+
+<button onclick="withdraw()">Withdraw</button>
+<button onclick="getUserCount()">User Count</button>
+
+<div id="output"></div>
+
+<script>
+
+// ======== CONTRACT SETUP ========
+const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
 const ABI = [
   {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[],"name":"AlreadyPurchased","type":"error"},
+  {"inputs":[],"name":"AlreadyRegistered","type":"error"},
+  {"inputs":[],"name":"AlreadyWithdrawn","type":"error"},
+  {"inputs":[],"name":"InvalidLength","type":"error"},
+  {"inputs":[],"name":"InvalidUsername","type":"error"},
+  {"inputs":[],"name":"MaximumLegs2","type":"error"},
+  {"inputs":[],"name":"MinimumWithdrawal","type":"error"},
+  {"inputs":[],"name":"ReentrancyGuardReentrantCall","type":"error"},
+  {"inputs":[],"name":"Ref1NotPurchased","type":"error"},
+  {"inputs":[],"name":"Ref2NotPurchased","type":"error"},
+  {"inputs":[],"name":"SelfReferralNotAllowed","type":"error"},
+  {"inputs":[],"name":"TakenUsername","type":"error"},
+  {"inputs":[],"name":"Terminated","type":"error"},
+  {
+    "inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],
+    "name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"
+  },
+  {
+    "inputs":[{"internalType":"string","name":"username","type":"string"}],
+    "name":"Register","outputs":[],"stateMutability":"payable","type":"function"
+  },
+  {
+    "inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],
+    "name":"UserBulkInfo","outputs":[
+      {"internalType":"string","name":"username","type":"string"},
+      {
+        "components":[
+          {"internalType":"uint256","name":"uniUsd","type":"uint256"},
+          {"internalType":"uint256","name":"biUsd","type":"uint256"},
+          {"internalType":"uint256","name":"vou","type":"uint256"},
+          {"internalType":"uint256","name":"mileUsd","type":"uint256"}
+        ],
+        "internalType":"struct BackBone.Balance","name":"latest","type":"tuple"
+      }
+    ],
+    "stateMutability":"view","type":"function"
+  },
   {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},
   {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
 ];
 
-let contract;
+let provider, signer, contract;
 
-async function initContract() {
-  contract = new ethers.Contract(
-    CONTRACT_ADDRESS,
-    ABI,
-    signer
-  );
-}
-
-/* بعد از اتصال والت صدا زده میشه */
-async function connectWallet() {
+// ======== WALLET CONNECT ========
+async function connectWallet(){
   try {
-    let ethProvider = window.ethereum || window.safepal?.ethereum || window.BinanceChain;
-    if (!ethProvider) {
-      alert("❌ فقط داخل SafePal → Discover");
-      return;
-    }
-
-    provider = new ethers.providers.Web3Provider(ethProvider, "any");
-    await provider.send("eth_requestAccounts", []);
-    signer = provider.getSigner();
-    userAddress = await signer.getAddress();
-
-    document.getElementById("walletStatus").innerText =
-      "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
-
-    await initContract(); // 👈 این خط مهمه
-
-  } catch (e) {
-    alert("❌ اتصال انجام نشد");
-  }
-}
-
-/* تست زنده */
-async function getUserCount() {
-  const count = await contract.UserCount();
-  alert("👥 Users: " + count.toString());
-}
-</script>)">Connect Wallet</button>
-<div id="walletStatus" style="margin-top:10px;color:green;"></div>
-
-<script>
-let provider, signer, userAddress;
-
-async function connectWallet() {
-  try {
-    let ethProvider = null;
-
-    if (window.ethereum) {
-      ethProvider = window.ethereum;
-    } else if (window.safepal && window.safepal.ethereum) {
-      ethProvider = window.safepal.ethereum;
-    } else if (window.BinanceChain) {
-      ethProvider = window.BinanceChain;
+    if(window.ethereum){
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts",[]);
+      signer = provider.getSigner();
+      document.getElementById("walletInfo").innerText = "Connected: " + await signer.getAddress();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     } else {
-      alert("❌ فقط از داخل SafePal → Discover باز کن");
-      return;
+      alert("⚠️ Install a Web3 Wallet (SafePal/MetaMask/Trust Wallet)");
     }
-
-    provider = new ethers.providers.Web3Provider(ethProvider, "any");
-    await provider.send("eth_requestAccounts", []);
-
-    signer = provider.getSigner();
-    userAddress = await signer.getAddress();
-
-    document.getElementById("walletStatus").innerText =
-      "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ اتصال کنسل شد");
+  } catch(e) {
+    alert("Connect Error: " + e.message);
   }
 }
+
+// ======== CALL FUNCTIONS ========
+async function registerUser(){
+  try {
+    let username = document.getElementById("inpUsername").value;
+    let ethVal = document.getElementById("inpRegETH").value;
+    let tx = await contract.Register(username, { value: ethers.utils.parseEther(ethVal) });
+    document.getElementById("output").innerText = "Register Sent: " + tx.hash;
+  } catch(e) { alert("Register Error: " + e.message); }
+}
+
+async function purchaseUser(){
+  try {
+    let r1 = document.getElementById("inpRef1").value;
+    let r2 = document.getElementById("inpRef2").value;
+    let ethVal = document.getElementById("inpPurETH").value;
+    let tx = await contract.Purchase(r1, r2, { value: ethers.utils.parseEther(ethVal) });
+    document.getElementById("output").innerText = "Purchase Sent: " + tx.hash;
+  } catch(e) { alert("Purchase Error: " + e.message); }
+}
+
+async function withdraw(){
+  try {
+    let tx = await contract.withdraw();
+    document.getElementById("output").innerText = "Withdraw Sent: " + tx.hash;
+  } catch(e) { alert("Withdraw Error: " + e.message); }
+}
+
+async function getUserCount(){
+  try {
+    let count = await contract.UserCount();
+    document.getElementById("output").innerText = "User Count: " + count.toString();
+  } catch(e) { alert("Count Error: " + e.message); }
+}
+
 </script>
 
 </body>
