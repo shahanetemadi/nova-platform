@@ -1,28 +1,24 @@
-import { ethers } from "ethers";
-import CONTRACT_ABI from "./abi.js";
+import ABI from "./abi.js";
+import { CONTRACT_ADDRESS, RPC_URL } from "./config.js";
 
-const CONTRACT_ADDRESS = https://bscscan.com/address/0x3810099D2D61e0399d07a3bad4e796A3De82ff27
+let web3;
+let contract;
 
-// اتصال به متامسک
-const getProvider = () => {
-  if (!window.ethereum) {
-    alert("MetaMask نصب نیست");
-    return null;
+export async function initContract() {
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+  } else {
+    web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
   }
-  return new ethers.BrowserProvider(window.ethereum);
-};
 
-// گرفتن کانترکت
-export const getContract = async () => {
-  const provider = getProvider();
-  if (!provider) return null;
+  contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+  return contract;
+}
 
-  await provider.send("eth_requestAccounts", []);
-  const signer = await provider.getSigner();
+export async function readOwner() {
+  return await contract.methods.owner().call();
+}
 
-  return new ethers.Contract(
-    CONTRACT_ADDRESS,
-    CONTRACT_ABI,
-    signer
-  );
-};
+export async function readTotalSupply() {
+  return await contract.methods.totalSupply().call();
+}
