@@ -5,117 +5,149 @@
 <title>NOVA Web3</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- FONT -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-
+<!-- SIMPLE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  overflow-y: auto;
-  font-family: 'Orbitron', sans-serif;
-  background: #02040a;
-  color: #e6f1ff;
+* { box-sizing: border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
+  background:#05070c;
+  color:#eaeaea;
+  font-family:'Inter',sans-serif;
+  font-size:13px;
 }
 
-/* ====== STAR BACKGROUND ====== */
-#stars, #stars2 {
-  position: fixed;
-  width: 200%;
-  height: 200%;
-  background-repeat: repeat;
-  z-index: -3;
-  animation: moveStars 120s linear infinite;
+/* ===== STAR BACKGROUND ===== */
+#stars{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 80%, #7df9ff, transparent),
+    radial-gradient(1px 1px at 50% 50%, #fff, transparent);
+  animation: stars 120s linear infinite;
+  z-index:-5;
 }
 
-#stars {
-  background-image:
-    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
-    radial-gradient(1px 1px at 100px 80px, #fff, transparent),
-    radial-gradient(1px 1px at 200px 150px, #fff, transparent);
+@keyframes stars{
+  from{transform:translateY(0);}
+  to{transform:translateY(-600px);}
 }
 
-#stars2 {
-  background-image:
-    radial-gradient(1px 1px at 50px 50px, #7df9ff, transparent),
-    radial-gradient(2px 2px at 150px 120px, #7df9ff, transparent);
-  animation-duration: 180s;
-  opacity: 0.6;
+/* ===== 3D PLANET ===== */
+.planet-wrap{
+  position:fixed;
+  top:80px;
+  right:30px;
+  width:140px;
+  height:140px;
+  perspective:800px;
+  z-index:-1;
 }
 
-@keyframes moveStars {
-  from { transform: translate(0,0); }
-  to { transform: translate(-500px, -500px); }
+.planet{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #9fdcff, #1a3a6b 60%, #040b18 100%);
+  box-shadow:
+    inset -20px -20px 40px rgba(0,0,0,0.6),
+    0 0 60px rgba(0,170,255,0.35);
+  animation: spin 18s linear infinite;
+  transform-style:preserve-3d;
 }
 
-/* ====== MOON ====== */
-#moon {
-  position: fixed;
-  top: 80px;
-  right: 40px;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffffff, #9aa9c9 60%, #5a6a8a);
-  box-shadow: 0 0 60px rgba(150,180,255,0.5);
-  animation: floatMoon 8s ease-in-out infinite;
-  z-index: -1;
+.planet::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.05),
+      rgba(255,255,255,0.05) 2px,
+      transparent 4px
+    );
+  mix-blend-mode:overlay;
 }
 
-@keyframes floatMoon {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+@keyframes spin{
+  from{transform:rotateY(0deg);}
+  to{transform:rotateY(360deg);}
 }
 
-/* ====== UI ====== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
+/* ===== HEADER ===== */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
 }
 
-.logo {
-  color: #00eaff;
-  font-size: 28px;
+.logo{
+  font-weight:500;
+  letter-spacing:2px;
+  color:#8fdcff;
 }
 
-.btn {
-  background: linear-gradient(135deg, #00eaff, #0077ff);
-  border: none;
-  color: #000;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-family: 'Orbitron';
-  margin-left: 8px;
+.actions{
+  display:flex;
+  gap:8px;
 }
 
-.container {
-  padding: 20px;
+/* ===== BUTTON ===== */
+.btn{
+  padding:8px 14px;
+  border-radius:8px;
+  border:none;
+  font-size:12px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#6fdcff,#3b7bff);
+  color:#000;
 }
 
-h1 {
-  color: #00eaff;
+/* ===== CONTENT ===== */
+.container{
+  max-width:480px;
+  margin:auto;
+  padding:20px;
 }
 
-.card {
-  background: rgba(10,20,40,0.85);
-  border-radius: 16px;
-  padding: 20px;
-  margin-top: 20px;
-  box-shadow: 0 0 30px rgba(0,234,255,0.15);
+h1{
+  font-size:22px;
+  font-weight:400;
+  color:#8fdcff;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
+p{opacity:0.7}
+
+/* ===== CARD ===== */
+.card{
+  background:rgba(15,25,50,0.7);
+  border-radius:14px;
+  padding:16px;
+  margin-top:18px;
+  box-shadow:0 0 20px rgba(0,150,255,0.12);
+  word-break:break-word;
+}
+
+/* ===== INPUT ===== */
+input{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+  border:none;
+  background:#0c1428;
+  color:#fff;
+  font-size:12px;
 }
 </style>
 </head>
@@ -123,104 +155,59 @@ input {
 <body>
 
 <div id="stars"></div>
-<div id="stars2"></div>
-<div id="moon"></div>
+
+<div class="planet-wrap">
+  <div class="planet"></div>
+</div>
 
 <header>
   <div class="logo">NOVA</div>
-  <div>
+  <div class="actions">
     <button class="btn" onclick="connectWallet()">Connect</button>
     <button class="btn" onclick="signWallet()">Sign</button>
   </div>
 </header>
 
 <div class="container">
-  <h1>NOVA Web3 Dashboard</h1>
-  <p>Live on-chain data from BSC</p>
+  <h1>Web3 Dashboard</h1>
+  <p>BSC on-chain data</p>
 
   <div class="card">
-    <h2>Dashboard</h2>
-    <p>Wallet: <span id="wallet">-</span></p>
-    <p>Username: <span id="username">-</span></p>
-    <p>Users: <span id="users">-</span></p>
-    <p>BNB Price (USD): <span id="price">-</span></p>
+    <div><strong>Wallet</strong><br><span id="wallet">-</span></div>
+    <div><strong>Users</strong>: <span id="users">-</span></div>
   </div>
 
   <div class="card">
-    <h2>Register</h2>
-    <input id="regUsername" placeholder="Username">
-    <button class="btn" onclick="register()">Register</button>
+    <strong>Register</strong>
+    <input placeholder="username">
+    <button class="btn" style="margin-top:10px">Register</button>
   </div>
 
   <div class="card">
-    <h2>Purchase</h2>
-    <input id="amount" placeholder="BNB Amount">
-    <button class="btn" onclick="purchase()">Purchase</button>
+    <strong>Purchase</strong>
+    <input placeholder="BNB amount">
+    <button class="btn" style="margin-top:10px">Buy</button>
   </div>
 </div>
 
 <script>
-let web3;
-let account;
-let contract;
+let web3,account;
 
-/* ====== CHANGE THESE ====== */
-const CONTRACT_ADDRESS = "0xYOUR_CONTRACT";
-const ABI = [ /* ABI HERE */ ];
-
-async function connectWallet() {
-  if (!window.ethereum) return alert("Wallet not found");
-
-  await ethereum.request({
-    method: 'wallet_switchEthereumChain',
-    params: [{ chainId: '0x38' }]
-  });
-
-  web3 = new Web3(window.ethereum);
-  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-  account = accounts[0];
-
-  document.getElementById("wallet").innerText = account;
-  contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-  loadDashboard();
+async function connectWallet(){
+  if(!window.ethereum) return alert("No wallet");
+  await ethereum.request({method:'eth_requestAccounts'});
+  web3=new Web3(window.ethereum);
+  account=(await web3.eth.getAccounts())[0];
+  document.getElementById("wallet").innerText=account;
 }
 
-async function signWallet() {
-  if (!account) return alert("Connect wallet first");
+async function signWallet(){
+  if(!account) return alert("Connect first");
   await ethereum.request({
-    method: "personal_sign",
-    params: ["NOVA Web3 Login", account]
+    method:"personal_sign",
+    params:["NOVA LOGIN",account]
   });
   alert("Signed");
-}
-
-async function loadDashboard() {
-  try {
-    const users = await contract.methods.userCount().call();
-    const username = await contract.methods.getUsername(account).call();
-    document.getElementById("users").innerText = users;
-    document.getElementById("username").innerText = username || "-";
-  } catch {}
-
-  fetch("https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT")
-    .then(r => r.json())
-    .then(d => document.getElementById("price").innerText = Number(d.price).toFixed(2));
-}
-
-async function register() {
-  const u = document.getElementById("regUsername").value;
-  await contract.methods.register(u).send({ from: account });
-  loadDashboard();
-}
-
-async function purchase() {
-  const amount = document.getElementById("amount").value;
-  await web3.eth.sendTransaction({
-    from: account,
-    to: CONTRACT_ADDRESS,
-    value: web3.utils.toWei(amount, "ether")
-  });
-  alert("Purchase complete");
 }
 </script>
 
