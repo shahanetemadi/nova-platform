@@ -2,185 +2,243 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NOVA | AI Web3 Ecosystem</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NOVA | Web3 Galaxy Platform</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- Web3 -->
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
-<!-- Scroll -->
-<script src="https://unpkg.com/scrollreveal"></script>
-
-<!-- Font -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --neon:#00ffe7;
-  --blue:#4da3ff;
-  --dark:#050812;
+  --title:'Oxanium',sans-serif;
+  --body:'Space Grotesk',sans-serif;
+  --neon:#6cf3ff;
+  --bg1:#050914;
+  --bg2:#02040a;
 }
-*{margin:0;padding:0;box-sizing:border-box}
+
+*{box-sizing:border-box}
+
 body{
-  font-family:'Orbitron',sans-serif;
-  background:var(--dark);
-  color:#fff;
+  margin:0;
+  font-family:var(--body);
+  background:radial-gradient(circle at top,#0b1230,var(--bg2));
+  color:#e9f1ff;
   overflow-x:hidden;
 }
-button{
-  background:linear-gradient(90deg,var(--blue),var(--neon));
-  border:none;
-  padding:12px 26px;
-  border-radius:30px;
-  cursor:pointer;
-  color:#000;
-  font-weight:600;
-}
-section{padding:100px 8%}
 
-/* HERO */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 40px;
+}
+
+.logo{
+  font-family:var(--title);
+  font-size:28px;
+  letter-spacing:3px;
+  color:var(--neon);
+}
+
+nav button{
+  background:none;
+  border:1px solid var(--neon);
+  color:var(--neon);
+  padding:8px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-family:var(--title);
+}
+
 .hero{
-  min-height:100vh;
-  background:
-    radial-gradient(circle at 20% 30%,#1a3cff55,transparent 40%),
-    radial-gradient(circle at 80% 70%,#00ffe755,transparent 40%),
-    url("https://images.unsplash.com/photo-1639322537504-6427a16b0a28");
-  background-size:cover;
+  min-height:90vh;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
+  padding:40px;
 }
-.hero h1{font-size:64px}
-.hero p{margin-top:20px;color:#9db4ff}
 
-/* GRID */
+.hero h1{
+  font-family:var(--title);
+  font-size:52px;
+  margin-bottom:20px;
+}
+
+.hero p{
+  max-width:700px;
+  margin:auto;
+  opacity:.85;
+}
+
+.actions{
+  margin-top:40px;
+}
+
+.btn{
+  background:linear-gradient(135deg,#6cf3ff,#3aa9ff);
+  border:none;
+  color:#000;
+  padding:14px 28px;
+  border-radius:14px;
+  font-family:var(--title);
+  cursor:pointer;
+  margin:10px;
+}
+
+section{
+  padding:100px 40px;
+  max-width:1200px;
+  margin:auto;
+}
+
+.card{
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(12px);
+  border-radius:20px;
+  padding:30px;
+  margin:20px 0;
+  border:1px solid rgba(108,243,255,.15);
+}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:30px;
-}
-.card{
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(14px);
-  border-radius:18px;
-  padding:30px;
-  transition:.4s;
-}
-.card:hover{transform:translateY(-10px);box-shadow:0 0 40px #00ffe744}
-
-/* ACTION BAR */
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-  justify-content:center;
-  margin-top:30px;
-}
-
-/* STATUS */
-.status{
-  margin-top:20px;
-  color:var(--neon);
-  word-break:break-all;
+  gap:24px;
 }
 
 footer{
-  padding:30px;
-  background:#02040a;
   text-align:center;
-  color:#777;
+  padding:40px;
+  opacity:.6;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
-<div class="hero">
+<canvas id="stars"></canvas>
+
+<header>
+  <div class="logo">NOVA</div>
+  <nav>
+    <button onclick="toggleLang()">EN / FA</button>
+    <button onclick="connectWallet()">CONNECT WALLET</button>
+  </nav>
+</header>
+
+<section class="hero">
   <div>
-    <h1>NOVA</h1>
-    <p>AI × Web3 × Binary Network on BSC</p>
+    <h1 id="title">THE FUTURE OF WEB3</h1>
+    <p id="desc">
+      NOVA is a decentralized galaxy-powered platform combining Web3, AI structures and binary genealogy on BSC.
+    </p>
     <div class="actions">
-      <button onclick="connectWallet()">Connect Wallet</button>
-      <button onclick="signWallet()">Sign Wallet</button>
-      <button onclick="scrollTo('dashboard')">Dashboard</button>
+      <button class="btn" onclick="connectWallet()">Launch App</button>
+      <button class="btn" onclick="alert('Phase 2 Ready')">Telegram Bot</button>
     </div>
-    <div class="status" id="walletStatus">Not Connected</div>
-    <div class="status" id="signStatus"></div>
   </div>
-</div>
+</section>
 
-<!-- FEATURES -->
 <section>
-  <h2>Core Features</h2>
   <div class="grid">
-    <div class="card">AI Neural Binary Logic</div>
-    <div class="card">On-Chain Transparency</div>
-    <div class="card">Wallet-Based Identity</div>
-  </div>
-</section>
-
-<!-- DASHBOARD -->
-<section id="dashboard">
-  <h2>User Control Panel</h2>
-  <div class="grid">
-    <div class="card" id="usernameBox">Username: -</div>
-    <div class="card" id="rewardBox">Rewards: -</div>
     <div class="card">
-      <div class="actions">
-        <button onclick="withdraw()">Withdraw</button>
-        <button onclick="refresh()">Refresh</button>
-      </div>
+      <h3>Binary System</h3>
+      <p>Live on-chain genealogy structure powered by smart contracts.</p>
+    </div>
+    <div class="card">
+      <h3>Galaxy UI</h3>
+      <p>3D-inspired canvas animations with cosmic motion.</p>
+    </div>
+    <div class="card">
+      <h3>Multilingual</h3>
+      <p>English & Persian – scalable to more languages.</p>
     </div>
   </div>
 </section>
 
-<footer>© 2025 NOVA – Phase 3</footer>
+<section>
+  <div class="card">
+    <h3>Wallet Info</h3>
+    <p id="wallet">Not Connected</p>
+  </div>
+</section>
+
+<footer>
+  © 2025 NOVA Platform – Powered by BSC
+</footer>
 
 <script>
-ScrollReveal().reveal('section',{distance:'80px',duration:1200});
-
-let web3, account, contract;
-const contractAddress="0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-
-const ABI=[
-{"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
-];
-
-function scrollTo(id){
-  document.getElementById(id).scrollIntoView({behavior:"smooth"});
+// ===== Galaxy Canvas =====
+const c=document.getElementById("stars");
+const ctx=c.getContext("2d");
+let w,h,stars=[];
+function resize(){
+  w=c.width=window.innerWidth;
+  h=c.height=window.innerHeight;
 }
+window.onresize=resize;
+resize();
 
+for(let i=0;i<200;i++){
+  stars.push({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    r:Math.random()*1.5,
+    s:Math.random()*0.5+0.2
+  });
+}
+function draw(){
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#6cf3ff";
+  stars.forEach(s=>{
+    ctx.globalAlpha=Math.random();
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+    s.y+=s.s;
+    if(s.y>h)s.y=0;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ===== Wallet Connect =====
+let web3;
 async function connectWallet(){
-  if(!window.ethereum) return alert("Wallet not found");
-  web3=new Web3(window.ethereum);
-  account=(await ethereum.request({method:"eth_requestAccounts"}))[0];
-  contract=new web3.eth.Contract(ABI,contractAddress);
-  document.getElementById("walletStatus").innerText="Connected: "+account;
-  refresh();
+  if(window.ethereum){
+    web3=new Web3(window.ethereum);
+    const acc=await ethereum.request({method:'eth_requestAccounts'});
+    document.getElementById("wallet").innerText=acc[0];
+  }else{
+    alert("Please open inside SafePal / Trust Wallet browser");
+  }
 }
 
-async function signWallet(){
-  if(!account) return alert("Connect wallet first");
-  const message="NOVA Authentication\n"+account+"\n"+Date.now();
-  const signature=await web3.eth.personal.sign(message,account);
-  document.getElementById("signStatus").innerText="Signed ✔️";
-  console.log("Signature:",signature);
-}
-
-async function refresh(){
-  if(!contract) return;
-  const data=await contract.methods.UserBulkInfo(account,false).call();
-  document.getElementById("usernameBox").innerText="Username: "+data.username;
-  document.getElementById("rewardBox").innerText=
-    "Rewards: "+web3.utils.fromWei(data.latest.biUsd,"ether")+" USD";
-}
-
-async function withdraw(){
-  if(!contract) return;
-  await contract.methods.withdraw().send({from:account});
+// ===== Language Toggle =====
+let lang="en";
+function toggleLang(){
+  lang=lang==="en"?"fa":"en";
+  if(lang==="fa"){
+    document.documentElement.dir="rtl";
+    title.innerText="آینده وب ۳";
+    desc.innerText="نوا یک پلتفرم غیرمتمرکز با ساختار باینری و طراحی کهکشانی روی بایننس اسمارت چین است.";
+  }else{
+    document.documentElement.dir="ltr";
+    title.innerText="THE FUTURE OF WEB3";
+    desc.innerText="NOVA is a decentralized galaxy-powered platform combining Web3, AI structures and binary genealogy on BSC.";
+  }
 }
 </script>
 
