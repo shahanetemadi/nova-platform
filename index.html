@@ -11,7 +11,55 @@
 
 <h2>Nova Platform – FINAL</h2>
 
-<button onclick="connectWallet()">Connect Wallet</button>
+<button onclick="connectWallet(<script>
+const CONTRACT_ADDRESS = "0xYOUR_CONTRACT_ADDRESS_HERE";
+
+const ABI = [
+  {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
+
+let contract;
+
+async function initContract() {
+  contract = new ethers.Contract(
+    CONTRACT_ADDRESS,
+    ABI,
+    signer
+  );
+}
+
+/* بعد از اتصال والت صدا زده میشه */
+async function connectWallet() {
+  try {
+    let ethProvider = window.ethereum || window.safepal?.ethereum || window.BinanceChain;
+    if (!ethProvider) {
+      alert("❌ فقط داخل SafePal → Discover");
+      return;
+    }
+
+    provider = new ethers.providers.Web3Provider(ethProvider, "any");
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    document.getElementById("walletStatus").innerText =
+      "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+
+    await initContract(); // 👈 این خط مهمه
+
+  } catch (e) {
+    alert("❌ اتصال انجام نشد");
+  }
+}
+
+/* تست زنده */
+async function getUserCount() {
+  const count = await contract.UserCount();
+  alert("👥 Users: " + count.toString());
+}
+</script>)">Connect Wallet</button>
 <div id="walletStatus" style="margin-top:10px;color:green;"></div>
 
 <script>
