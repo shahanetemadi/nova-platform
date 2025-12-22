@@ -1,82 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Nova Platform</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
-  <style>
-    body { font-family: sans-serif; padding:20px; }
-    button { margin:5px; padding:10px; }
-    input { margin:5px; padding:5px; }
-  </style>
-</head>
-<body>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-<h2>Nova Platform – FINAL</h2>
+<script>
+let provider, signer, userAddress;
 
-<button onclick="connect()">Connect Wallet</button>
+async function connectWallet() {
+  try {
+    if (typeof window.ethereum === "undefined") {
+      alert("❌ لطفاً سایت را فقط از داخل SafePal (Discover) باز کنید");
+      return;
+    }
 
-<hr>
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 
-<input id="username" placeholder="username">
-<input id="regEth" placeholder="ETH">
-<button onclick="register()">Register</button>
+    // درخواست اتصال
+    await provider.send("eth_requestAccounts", []);
 
-<hr>
+    signer = provider.getSigner();
+    userAddress = await signer.getAddress();
 
-<input id="ref1" placeholder="ref1">
-<input id="ref2" placeholder="ref2">
-<input id="buyEth" placeholder="ETH">
-<button onclick="purchase()">Purchase</button>
+    document.getElementById("walletStatus").innerText =
+      "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
 
-<hr>
-
-<button onclick="withdraw()">Withdraw</button>
-<button onclick="count()">User Count</button>
-
-<p id="out"></p>
-
-<script type="module">
-  import {
-    connectWallet,
-    register as reg,
-    purchase as buy,
-    withdraw as wd,
-    userCount
-  } from "./contract.js";
-
-  window.connect = async () => {
-    await connectWallet();
-    alert("Connected");
-  };
-
-  window.register = async () => {
-    await reg(
-      document.getElementById("username").value,
-      document.getElementById("regEth").value
-    );
-    alert("Registered");
-  };
-
-  window.purchase = async () => {
-    await buy(
-      document.getElementById("ref1").value,
-      document.getElementById("ref2").value,
-      document.getElementById("buyEth").value
-    );
-    alert("Purchased");
-  };
-
-  window.withdraw = async () => {
-    await wd();
-    alert("Withdraw done");
-  };
-
-  window.count = async () => {
-    const c = await userCount();
-    document.getElementById("out").innerText = "Users: " + c;
-  };
+    console.log("Connected:", userAddress);
+  } catch (err) {
+    console.error(err);
+    alert("❌ اتصال انجام نشد، یک بار صفحه را رفرش کنید");
+  }
+}
 </script>
-
-</body>
-</html>
