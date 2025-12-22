@@ -1,57 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>NOVA | Web3 Platform</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NOVA Web3 Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Vazirmatn:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Web3 -->
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:Orbitron,Vazirmatn,sans-serif;
-  background:radial-gradient(circle at top,#0b1d3a,#020617);
-  color:#fff;
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at top, #0b1d3a, #02040a);
+  color: #e6f1ff;
 }
-header{
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+
+header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.logo{color:#00f0ff;font-size:22px;letter-spacing:3px}
-button{
-  background:linear-gradient(135deg,#00f0ff,#0066ff);
-  border:none;
-  padding:10px 18px;
-  border-radius:14px;
-  color:#fff;
-  cursor:pointer;
+
+.logo {
+  font-size: 28px;
+  color: #00e5ff;
+  letter-spacing: 3px;
 }
-input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  margin-bottom:10px;
+
+button {
+  background: linear-gradient(135deg, #00e5ff, #007bff);
+  border: none;
+  color: #000;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  margin-left: 8px;
 }
-section{padding:30px}
-.card{
-  background:#030712;
-  border-radius:20px;
-  padding:25px;
-  margin-bottom:20px;
+
+button:hover {
+  opacity: 0.85;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:15px;
+
+.container {
+  padding: 20px;
 }
-.stat{background:#020617;border-radius:16px;padding:15px}
-.stat h4{color:#00f0ff;margin:0}
-small{color:#9ca3af}
+
+.card {
+  background: rgba(5, 15, 30, 0.9);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 25px rgba(0,229,255,0.08);
+}
+
+h1, h2 {
+  color: #00e5ff;
+}
+
+.label {
+  color: #7ddfff;
+  font-size: 14px;
+}
+
+.value {
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.4;
+}
 </style>
 </head>
 
@@ -65,97 +100,136 @@ small{color:#9ca3af}
   </div>
 </header>
 
-<section>
-  <h2>NOVA Web3 Dashboard</h2>
+<div class="container">
+
+  <h1>NOVA Web3 Dashboard</h1>
   <p>Live on-chain data from BSC</p>
-</section>
 
-<!-- DASHBOARD -->
-<section class="card">
-  <h3>Dashboard</h3><br>
-  <div class="grid">
-    <div class="stat"><h4>Wallet</h4><small id="wallet">-</small></div>
-    <div class="stat"><h4>Username</h4><small id="username">-</small></div>
-    <div class="stat"><h4>Users</h4><small id="users">-</small></div>
-    <div class="stat"><h4>UNI USD</h4><small id="uni">-</small></div>
-    <div class="stat"><h4>BI USD</h4><small id="bi">-</small></div>
-    <div class="stat"><h4>Voucher</h4><small id="vou">-</small></div>
-    <div class="stat"><h4>Mile USD</h4><small id="mile">-</small></div>
+  <!-- DASHBOARD -->
+  <div class="card">
+    <h2>Dashboard</h2>
+
+    <div class="label">Wallet</div>
+    <div class="value" id="wallet">-</div>
+
+    <div class="label">Username</div>
+    <div class="value" id="username">-</div>
+
+    <div class="label">Users</div>
+    <div class="value" id="users">-</div>
+
+    <div class="label">BNB Price (USD)</div>
+    <div class="value" id="price">-</div>
   </div>
-</section>
 
-<!-- REGISTER -->
-<section class="card">
-  <h3>Register</h3><br>
-  <input id="regUsername" placeholder="Username">
-  <button onclick="registerUser()">Register</button>
-</section>
+  <!-- REGISTER -->
+  <div class="card">
+    <h2>Register</h2>
+    <input id="regUsername" placeholder="Username"/>
+    <button onclick="register()">Register</button>
+  </div>
 
-<!-- PURCHASE -->
-<section class="card">
-  <h3>Purchase</h3><br>
-  <input id="ref1" placeholder="Refer 1 Username">
-  <input id="ref2" placeholder="Refer 2 Username">
-  <button onclick="purchase()">Purchase</button>
-</section>
+  <!-- PURCHASE -->
+  <div class="card">
+    <h2>Purchase</h2>
+    <input id="amount" placeholder="Amount (BNB)"/>
+    <button onclick="purchase()">Purchase</button>
+  </div>
+
+</div>
+
+<footer>
+  NOVA © 2025 — BSC Web3 Platform
+</footer>
 
 <script>
-/* ---------- CONFIG ---------- */
-const CONTRACT="0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-const ABI=[
-{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"payable","type":"function"},
-{"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"},
-{"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"}
+let web3;
+let account;
+let contract;
+
+// ================= CONFIG =================
+const CONTRACT_ADDRESS = "0xYOUR_CONTRACT_ADDRESS";
+
+const ABI = [
+  {
+    "inputs":[{"internalType":"string","name":"username","type":"string"}],
+    "name":"register",
+    "outputs":[],
+    "stateMutability":"nonpayable",
+    "type":"function"
+  },
+  {
+    "inputs":[],
+    "name":"userCount",
+    "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+    "stateMutability":"view",
+    "type":"function"
+  },
+  {
+    "inputs":[{"internalType":"address","name":"user","type":"address"}],
+    "name":"getUsername",
+    "outputs":[{"internalType":"string","name":"","type":"string"}],
+    "stateMutability":"view",
+    "type":"function"
+  }
 ];
+// =========================================
 
-let provider,signer,contract;
+async function connectWallet() {
+  if (!window.ethereum) return alert("Wallet not found");
 
-/* ---------- WALLET ---------- */
-async function connectWallet(){
-  provider=new ethers.providers.Web3Provider(window.ethereum);
-  await provider.send("eth_requestAccounts",[]);
-  signer=provider.getSigner();
-  contract=new ethers.Contract(CONTRACT,ABI,signer);
-  wallet.innerText=await signer.getAddress();
+  web3 = new Web3(window.ethereum);
+  await ethereum.request({ method: "eth_requestAccounts" });
+
+  const accounts = await web3.eth.getAccounts();
+  account = accounts[0];
+
+  contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+
+  document.getElementById("wallet").innerText = account;
+
   loadDashboard();
 }
 
-async function signWallet(){
-  if(!signer) return alert("Connect wallet first");
-  await signer.signMessage("NOVA AUTH");
+async function signWallet() {
+  if (!account) return alert("Connect wallet first");
+  const msg = "NOVA Web3 Authentication";
+  await web3.eth.personal.sign(msg, account);
+  alert("Signed successfully");
 }
 
-/* ---------- DASHBOARD ---------- */
-async function loadDashboard(){
-  const addr=await signer.getAddress();
-  const info=await contract.UserBulkInfo(addr,false);
-  username.innerText=info.username||"-";
-  uni.innerText=ethers.utils.formatUnits(info.latest.uniUsd,18);
-  bi.innerText=ethers.utils.formatUnits(info.latest.biUsd,18);
-  vou.innerText=info.latest.vou;
-  mile.innerText=ethers.utils.formatUnits(info.latest.mileUsd,18);
-  users.innerText=(await contract.UserCount()).toString();
+async function loadDashboard() {
+  const count = await contract.methods.userCount().call();
+  const username = await contract.methods.getUsername(account).call();
+
+  document.getElementById("users").innerText = count;
+  document.getElementById("username").innerText = username || "-";
+
+  // simple price fetch
+  fetch("https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT")
+    .then(res => res.json())
+    .then(d => document.getElementById("price").innerText = parseFloat(d.price).toFixed(2));
 }
 
-/* ---------- REGISTER ---------- */
-async function registerUser(){
-  const u=regUsername.value.trim();
-  if(!u) return alert("Username required");
-  const tx=await contract.Register(u,{value:ethers.utils.parseEther("0.01")});
-  await tx.wait();
-  alert("Registered!");
+async function register() {
+  const username = document.getElementById("regUsername").value;
+  if (!username) return alert("Enter username");
+
+  await contract.methods.register(username).send({ from: account });
   loadDashboard();
 }
 
-/* ---------- PURCHASE ---------- */
-async function purchase(){
-  const r1=ref1.value.trim();
-  const r2=ref2.value.trim();
-  const tx=await contract.Purchase(r1,r2,{value:ethers.utils.parseEther("0.01")});
-  await tx.wait();
-  alert("Purchase successful!");
-  loadDashboard();
+async function purchase() {
+  const amount = document.getElementById("amount").value;
+  if (!amount) return alert("Enter amount");
+
+  await web3.eth.sendTransaction({
+    from: account,
+    to: CONTRACT_ADDRESS,
+    value: web3.utils.toWei(amount, "ether")
+  });
+
+  alert("Purchase completed");
 }
 </script>
 
