@@ -1,126 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NOVA Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ethers -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family: 'Orbitron', Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1a3a, #000);
+  color:#fff;
+  overflow-x:hidden;
+}
+
+header {
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo {
+  font-size:24px;
+  letter-spacing:2px;
+  color:#00e5ff;
+}
+
+button {
+  padding:12px 22px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,#00e5ff,#4facfe);
+  color:#000;
+  cursor:pointer;
+  box-shadow:0 0 20px rgba(0,229,255,0.4);
+}
+
+section {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:40px 20px;
+}
+
+h1 {
+  font-size:48px;
+  margin-bottom:20px;
+}
+
+p {
+  max-width:600px;
+  opacity:0.85;
+  line-height:1.6;
+}
+
+.card {
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  padding:30px;
+  margin-top:30px;
+  width:100%;
+  max-width:500px;
+  box-shadow:0 0 30px rgba(0,229,255,0.15);
+}
+
+.status {
+  margin-top:15px;
+  word-break:break-all;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">NOVA</div>
+  <button onclick="connectWallet()">Connect Wallet</button>
+</header>
+
+<section>
+  <h1>The Future of Web3</h1>
+  <p>
+    NOVA is a decentralized galaxy-powered platform combining Web3,
+    AI structures and binary genealogy on BSC.
+  </p>
+
+  <div class="card">
+    <button onclick="signWallet()">Sign Wallet</button>
+    <div id="wallet" class="status">Wallet: Not connected</div>
+    <div id="signature" class="status"></div>
+    <div id="users" class="status"></div>
+  </div>
+</section>
+
 <script>
-/* ================= CONFIG ================= */
+let provider, signer, contract;
+
 const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
 
 const ABI = [
-  {
-    "inputs": [],
-    "name": "UserCount",
-    "outputs": [{"internalType":"uint256","name":"count","type":"uint256"}],
-    "stateMutability":"view",
-    "type":"function"
-  },
-  {
-    "inputs":[{"internalType":"string","name":"username","type":"string"}],
-    "name":"Register",
-    "outputs":[],
-    "stateMutability":"payable",
-    "type":"function"
-  },
-  {
-    "inputs":[],
-    "name":"withdraw",
-    "outputs":[],
-    "stateMutability":"nonpayable",
-    "type":"function"
-  }
+  {"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+  {"inputs":[],"name":"UserCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-let provider, signer, contract, userAddress;
-
-/* ================= WALLET ================= */
 async function connectWallet() {
   try {
-    let ethProvider = null;
+    let eth = null;
 
-    if (window.ethereum) {
-      ethProvider = window.ethereum;
-    } else if (window.safepal?.ethereum) {
-      ethProvider = window.safepal.ethereum;
-    } else {
-      alert("❌ Wallet not detected. Use SafePal browser.");
-      return;
-    }
+    if (window.ethereum) eth = window.ethereum;
+    else if (window.safepal && window.safepal.ethereum) eth = window.safepal.ethereum;
+    else return alert("Wallet not found");
 
-    await ethProvider.request({ method: "eth_requestAccounts" });
+    await eth.request({ method: "eth_requestAccounts" });
 
-    provider = new ethers.providers.Web3Provider(ethProvider);
+    provider = new ethers.providers.Web3Provider(eth);
     signer = provider.getSigner();
-    userAddress = await signer.getAddress();
 
-    document.getElementById("walletStatus").innerText =
-      "Connected: " + userAddress;
+    const address = await signer.getAddress();
+    document.getElementById("wallet").innerText = "Wallet: " + address;
 
-    initContract();
-
-  } catch (e) {
-    alert("Wallet connection failed");
-    console.error(e);
-  }
-}
-
-/* ================= SIGN ================= */
-async function signLogin() {
-  if (!signer) {
-    alert("Connect wallet first");
-    return;
-  }
-
-  const message = "Login to NOVA Platform";
-  await signer.signMessage(message);
-
-  document.getElementById("dashboard").classList.remove("hidden");
-}
-
-/* ================= CONTRACT ================= */
-function initContract() {
-  contract = new ethers.Contract(
-    CONTRACT_ADDRESS,
-    ABI,
-    signer
-  );
-
-  loadDashboard();
-}
-
-async function loadDashboard() {
-  try {
+    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
     const count = await contract.UserCount();
-    document.getElementById("userCount").innerText = count.toString();
-    document.getElementById("walletAddr").innerText = userAddress;
+    document.getElementById("users").innerText = "User Count: " + count;
+
   } catch (e) {
-    console.error(e);
+    alert(e.message);
   }
 }
 
-/* ================= ACTIONS ================= */
-async function register() {
-  try {
-    const username = document.getElementById("username").value;
-    if (!username) return alert("Enter username");
+async function signWallet() {
+  if (!signer) return alert("Connect wallet first");
 
-    const tx = await contract.Register(username, {
-      value: ethers.utils.parseEther("2")
-    });
-    await tx.wait();
-
-    alert("✅ Registered successfully");
-
-  } catch (e) {
-    alert("Register failed");
-    console.error(e);
-  }
-}
-
-async function withdraw() {
-  try {
-    const tx = await contract.withdraw();
-    await tx.wait();
-    alert("Withdraw done");
-  } catch (e) {
-    alert("Withdraw failed");
-    console.error(e);
-  }
+  const message = "NOVA activation signature";
+  const sig = await signer.signMessage(message);
+  document.getElementById("signature").innerText = "Signature: " + sig;
 }
 </script>
+
+</body>
+</html>
