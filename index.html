@@ -2,86 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NOVA | Galactic Platform</title>
+<title>Galactic DApp</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-  background:#000;
+  background:#05060c;
   color:#fff;
+  font-family:system-ui,Segoe UI,Arial;
   overflow-x:hidden;
-  min-height:200vh;
 }
 
 /* ===== SPACE ===== */
-.space{position:fixed;inset:0;z-index:-5}
+.space{
+  position:fixed;
+  inset:0;
+  z-index:-10;
+  perspective:800px;
+}
 .stars{
-  position:absolute;inset:-50%;
+  position:absolute;
+  inset:-100%;
   background:
-    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 20% 30%, #fff, transparent),
     radial-gradient(1px 1px at 70% 80%, #aaa, transparent),
     radial-gradient(1px 1px at 40% 60%, #fff, transparent),
     radial-gradient(1px 1px at 90% 10%, #bbb, transparent);
-  background-size:220px 220px;
-  animation:stars 140s linear infinite;
-  opacity:.6;
+  background-size:240px 240px;
+  animation:stars 160s linear infinite;
+  opacity:.55;
 }
-@keyframes stars{from{transform:translateY(0)}to{transform:translateY(1400px)}}
+@keyframes stars{
+  from{transform:translateY(0)}
+  to{transform:translateY(1600px)}
+}
 
-.moon{
+/* ===== 3D PLANET ===== */
+.planet-wrap{
   position:absolute;
-  width:260px;height:260px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%, #fff, #bbb 60%, #666);
-  top:12%;left:60%;
-  box-shadow:0 0 60px rgba(255,255,255,.35),
-             inset -30px -30px 40px rgba(0,0,0,.6);
+  top:8%;
+  left:55%;
+  width:220px;
+  height:220px;
+  transform-style:preserve-3d;
+}
+.planet{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #fff, #cfcfcf 45%, #7a7a7a 70%);
+  box-shadow:
+    inset -40px -40px 60px rgba(0,0,0,.7),
+    0 0 80px rgba(255,255,255,.25);
+  animation:spin 18s linear infinite;
+}
+@keyframes spin{
+  from{transform:rotateY(0deg)}
+  to{transform:rotateY(360deg)}
 }
 
 /* ===== UI ===== */
 .container{
-  max-width:420px;
+  max-width:380px;
   margin:auto;
-  padding-top:120px;
+  padding:110px 16px 80px;
   text-align:center;
 }
-h1{font-size:26px;margin-bottom:30px;letter-spacing:2px}
+
+h1{
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:1.2px;
+  margin-bottom:24px;
+  opacity:.9;
+}
 
 .card{
-  background:rgba(10,10,30,.7);
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  background:rgba(15,18,40,.75);
+  backdrop-filter:blur(10px);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.55);
 }
 
 input{
   width:100%;
-  padding:12px;
+  padding:11px 14px;
   border-radius:12px;
   border:none;
-  margin-bottom:12px;
-  font-size:14px;
+  margin-bottom:10px;
+  font-size:13px;
 }
 
 button{
   width:100%;
-  padding:14px;
+  padding:13px;
   border:none;
-  border-radius:30px;
-  background:linear-gradient(135deg,#6a5cff,#9f6bff);
+  border-radius:28px;
+  background:linear-gradient(135deg,#6f63ff,#9f7bff);
   color:#fff;
-  font-size:15px;
+  font-size:14px;
   cursor:pointer;
 }
-button:hover{opacity:.9}
+button:active{transform:scale(.98)}
 
-.addr{font-size:12px;opacity:.7;word-break:break-all}
+.addr{
+  font-size:11px;
+  opacity:.65;
+  margin:8px 0 18px;
+  word-break:break-all;
+}
 
-@media(max-width:768px){
-  .moon{width:180px;height:180px;left:55%}
+/* ===== MOBILE ===== */
+@media(max-width:480px){
+  .planet-wrap{
+    width:170px;
+    height:170px;
+    left:52%;
+  }
 }
 </style>
 </head>
@@ -90,120 +133,56 @@ button:hover{opacity:.9}
 
 <div class="space">
   <div class="stars"></div>
-  <div class="moon"></div>
+  <div class="planet-wrap">
+    <div class="planet"></div>
+  </div>
 </div>
 
 <div class="container">
   <h1>Galactic Decentralized Platform</h1>
 
   <button onclick="connect()">Connect Wallet</button>
-  <p id="wallet" class="addr">Not connected</p>
+  <div id="wallet" class="addr">Not connected</div>
 
   <div class="card">
-    <h3>Register (2 USDT)</h3>
+    <b style="font-size:13px">Register (2 USDT)</b><br><br>
     <input id="username" placeholder="username">
     <button onclick="register()">Register</button>
   </div>
 
   <div class="card">
-    <h3>Purchase (10 USDT)</h3>
+    <b style="font-size:13px">Purchase (10 USDT)</b><br><br>
     <input id="ref1" placeholder="ref1 username">
     <input id="ref2" placeholder="ref2 username">
     <button onclick="purchase()">Purchase</button>
   </div>
 
   <div class="card">
-    <h3>User Info</h3>
-    <button onclick="loadInfo()">Load Dashboard</button>
-    <pre id="info" style="font-size:11px;text-align:left;margin-top:10px"></pre>
+    <button onclick="loadInfo()">User Info</button>
+    <pre id="info" style="font-size:10px;text-align:left;margin-top:10px"></pre>
   </div>
 
   <div class="card">
-    <h3>Withdraw</h3>
     <button onclick="withdraw()">Withdraw</button>
   </div>
 </div>
 
 <script>
-/* ===== CONFIG ===== */
-const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"; // BSC USDT
-
-const ABI = [ /* ABI FULL */ 
-{"inputs":[{"internalType":"contract IOrigin","name":"_origin","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-{"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"payable","type":"function"},
-{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"payable","type":"function"},
-{"inputs":[{"internalType":"address","name":"userAddr","type":"address"},{"internalType":"bool","name":"showNotifications","type":"bool"}],"name":"UserBulkInfo","outputs":[{"internalType":"string","name":"username","type":"string"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"latest","type":"tuple"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Balance","name":"current","type":"tuple"},{"components":[{"internalType":"uint256","name":"uniUsd","type":"uint256"},{"internalType":"uint256","name":"biUsd","type":"uint256"},{"internalType":"uint256","name":"vou","type":"uint256"},{"internalType":"uint256","name":"mileUsd","type":"uint256"}],"internalType":"struct BackBone.Earned","name":"totalEarned","type":"tuple"},{"components":[{"internalType":"uint64","name":"leftCount","type":"uint64"},{"internalType":"uint64","name":"rightCount","type":"uint64"},{"internalType":"uint64","name":"points","type":"uint64"},{"internalType":"uint64","name":"flushes","type":"uint64"}],"internalType":"struct BackBone.Activity","name":"activity","type":"tuple"},{"internalType":"string","name":"notification","type":"string"}],"stateMutability":"view","type":"function"},
-{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}
-];
-
-const USDT_ABI = [
-  "function approve(address,uint256) external returns(bool)"
-];
-
-let provider, signer, contract, usdt;
-
-/* ===== CONNECT ===== */
-async function connect(){
-  if(!window.ethereum) return alert("Install MetaMask");
-  await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x38'}]});
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  await provider.send("eth_requestAccounts",[]);
-  signer = provider.getSigner();
-  contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-  usdt = new ethers.Contract(USDT_ADDRESS, USDT_ABI, signer);
-  document.getElementById("wallet").innerText = await signer.getAddress();
-}
-
-/* ===== REGISTER ===== */
-async function register(){
-  await usdt.approve(CONTRACT_ADDRESS, ethers.utils.parseUnits("2",18));
-  const tx = await contract.Register(
-    document.getElementById("username").value,
-    { value: ethers.utils.parseUnits("2",18) }
-  );
-  await tx.wait();
-  alert("Registered");
-}
-
-/* ===== PURCHASE ===== */
-async function purchase(){
-  await usdt.approve(CONTRACT_ADDRESS, ethers.utils.parseUnits("10",18));
-  const tx = await contract.Purchase(
-    document.getElementById("ref1").value,
-    document.getElementById("ref2").value,
-    { value: ethers.utils.parseUnits("10",18) }
-  );
-  await tx.wait();
-  alert("Purchased");
-}
-
-/* ===== DASHBOARD ===== */
-async function loadInfo(){
-  const addr = await signer.getAddress();
-  const data = await contract.UserBulkInfo(addr,true);
-  document.getElementById("info").innerText = JSON.stringify(data,null,2);
-}
-
-/* ===== WITHDRAW ===== */
-async function withdraw(){
-  const tx = await contract.withdraw();
-  await tx.wait();
-  alert("Withdraw done");
-}
-
 /* ===== PARALLAX ===== */
-const moon=document.querySelector('.moon'),stars=document.querySelector('.stars');
+const planet=document.querySelector('.planet-wrap');
+const stars=document.querySelector('.stars');
+
 window.addEventListener('mousemove',e=>{
-  const x=(e.clientX/window.innerWidth-.5)*30;
-  const y=(e.clientY/window.innerHeight-.5)*30;
-  moon.style.transform=`translate(${x}px,${y}px)`;
+  const x=(e.clientX/window.innerWidth-.5)*25;
+  const y=(e.clientY/window.innerHeight-.5)*25;
+  planet.style.transform=`translate(${x}px,${y}px)`;
   stars.style.transform=`translate(${x*2}px,${y*2}px)`;
 });
 window.addEventListener('scroll',()=>{
-  moon.style.transform=`translateY(${scrollY*.15}px)`;
-  stars.style.transform=`translateY(${scrollY*.3}px)`;
+  planet.style.transform=`translateY(${scrollY*.12}px)`;
+  stars.style.transform=`translateY(${scrollY*.28}px)`;
 });
 </script>
+
 </body>
 </html>
