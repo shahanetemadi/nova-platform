@@ -1,4 +1,18 @@
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nova Platform</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+
+<body>
+
+<h2>Nova Platform – FINAL</h2>
+
+<button onclick="connectWallet()">Connect Wallet</button>
+<div id="walletStatus" style="margin-top:10px;color:green;"></div>
 
 <script>
 let provider, signer, userAddress;
@@ -14,12 +28,11 @@ async function connectWallet() {
     } else if (window.BinanceChain) {
       ethProvider = window.BinanceChain;
     } else {
-      alert("❌ لطفاً سایت را فقط از داخل SafePal → Discover باز کنید");
+      alert("❌ فقط از داخل SafePal → Discover باز کن");
       return;
     }
 
     provider = new ethers.providers.Web3Provider(ethProvider, "any");
-
     await provider.send("eth_requestAccounts", []);
 
     signer = provider.getSigner();
@@ -28,11 +41,12 @@ async function connectWallet() {
     document.getElementById("walletStatus").innerText =
       "✅ Connected: " + userAddress.slice(0,6) + "..." + userAddress.slice(-4);
 
-    console.log("Wallet Connected:", userAddress);
-
-  } catch (e) {
-    console.error(e);
-    alert("❌ اتصال رد شد یا کنسل شد");
+  } catch (err) {
+    console.error(err);
+    alert("❌ اتصال کنسل شد");
   }
 }
 </script>
+
+</body>
+</html>
