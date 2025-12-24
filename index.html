@@ -1,118 +1,165 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BNB Register & Purchase</title>
+<meta charset="UTF-8" />
+<title>NOVA | Galactic Platform</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.1/dist/ethers.umd.min.js"></script>
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
 <style>
-body {
-  background: radial-gradient(circle at bottom, #020111, #000);
-  color: #fff;
-  font-family: sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+html,body{
+  margin:0;
+  padding:0;
+  background:#05010d;
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  overflow-x:hidden;
 }
-.box {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  padding: 30px;
-  border-radius: 16px;
-  width: 320px;
-  text-align: center;
+canvas{
+  position:fixed;
+  top:0;left:0;
+  z-index:-1;
 }
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
+section{
+  min-height:100vh;
+  padding:80px 20px;
+  text-align:center;
 }
-.connect { background: #f3ba2f; color:#000; }
-.reg { background: #4caf50; color:#fff; }
-.buy { background: #2196f3; color:#fff; }
-.status { margin-top: 15px; font-size: 14px; opacity: .9; }
+h1{font-size:42px;margin-bottom:10px;}
+button{
+  background:linear-gradient(135deg,#6e00ff,#00c6ff);
+  border:none;
+  color:#fff;
+  padding:14px 26px;
+  border-radius:30px;
+  font-size:14px;
+  cursor:pointer;
+  margin:10px;
+}
+button:hover{opacity:.85}
+.card{
+  max-width:420px;
+  margin:20px auto;
+  background:rgba(255,255,255,0.06);
+  border-radius:20px;
+  padding:25px;
+  backdrop-filter:blur(10px);
+}
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin:10px 0;
+}
+small{opacity:.7}
 </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>BNB Moon System 🌙</h2>
+<canvas id="space"></canvas>
 
-  <button class="connect" onclick="connectWallet()">Connect Wallet</button>
-  <button class="reg" onclick="register()">Register (2$ BNB)</button>
-  <button class="buy" onclick="purchase()">Purchase (10$ BNB)</button>
+<section>
+  <h1>NOVA</h1>
+  <p>Galactic Decentralized Platform</p>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="wallet"></p>
+</section>
 
-  <div class="status" id="status">Wallet not connected</div>
-</div>
+<section>
+  <div class="card">
+    <h3>Register (2 USDT)</h3>
+    <input id="username" placeholder="username">
+    <button onclick="register()">Register</button>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h3>Purchase (10 USDT)</h3>
+    <input id="ref1" placeholder="referrer 1">
+    <input id="ref2" placeholder="referrer 2">
+    <button onclick="purchase()">Purchase</button>
+  </div>
+</section>
 
 <script>
+// ========= SPACE BACKGROUND =========
+const canvas=document.getElementById('space');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+let stars=[...Array(200)].map(()=>({
+ x:Math.random()*canvas.width,
+ y:Math.random()*canvas.height,
+ r:Math.random()*1.5
+}));
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle='white';
+ stars.forEach(s=>{
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+  ctx.fill();
+  s.y+=0.2;
+  if(s.y>canvas.height)s.y=0;
+ });
+ requestAnimationFrame(draw);
+}
+draw();
+
+// ========= WEB3 =========
+let web3, account;
 const CONTRACT_ADDRESS = "0x3810099D2D61e0399d07a3bad4e796A3De82ff27";
-const BNB_USD_FEED = "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE"; // Chainlink BNB/USD
+const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
 
-const CONTRACT_ABI = [
-  "function Register(string username) payable",
-  "function Purchase(string refer1, string refer2) payable"
+const ABI = [
+ {"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"Register","outputs":[],"stateMutability":"nonpayable","type":"function"},
+ {"inputs":[{"internalType":"string","name":"refer1","type":"string"},{"internalType":"string","name":"refer2","type":"string"}],"name":"Purchase","outputs":[],"stateMutability":"nonpayable","type":"function"}
 ];
 
-const PRICE_ABI = [
-  "function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)"
+const ERC20_ABI = [
+ {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}
 ];
 
-let provider, signer, contract;
-
-async function connectWallet() {
-  if (!window.ethereum) return alert("MetaMask نصب نیست");
-
-  await ethereum.request({ method: "eth_requestAccounts" });
-  provider = new ethers.BrowserProvider(window.ethereum);
-  signer = await provider.getSigner();
-
-  const network = await provider.getNetwork();
-  if (network.chainId !== 56n) {
-    alert("لطفا شبکه را روی BNB Chain قرار دهید");
-    return;
-  }
-
-  contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-  document.getElementById("status").innerText = "Wallet connected ✅";
+async function connectWallet(){
+ if(window.ethereum){
+   web3=new Web3(window.ethereum);
+   const accs=await ethereum.request({method:'eth_requestAccounts'});
+   account=accs[0];
+   document.getElementById('wallet').innerText=account;
+ }else{
+   alert("Wallet not found");
+ }
 }
 
-async function getBNBAmount(usd) {
-  const priceFeed = new ethers.Contract(BNB_USD_FEED, PRICE_ABI, provider);
-  const data = await priceFeed.latestRoundData();
-  const price = Number(data[1]) / 1e8; // BNB price in USD
-  const bnb = usd / price;
-  return ethers.parseEther(bnb.toFixed(6));
+async function approveUSDT(amount){
+ const usdt=new web3.eth.Contract(ERC20_ABI,USDT_ADDRESS);
+ const value=web3.utils.toWei(amount,'ether');
+ return usdt.methods.approve(CONTRACT_ADDRESS,value).send({from:account});
 }
 
-async function register() {
-  const username = prompt("Username:");
-  if (!username) return;
-
-  const value = await getBNBAmount(2);
-  const tx = await contract.Register(username, { value });
-  document.getElementById("status").innerText = "Register tx sent...";
-  await tx.wait();
-  document.getElementById("status").innerText = "Registered successfully ✅";
+async function register(){
+ const username=document.getElementById('username').value;
+ if(!username) return alert("Username required");
+ await approveUSDT("2");
+ const c=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
+ await c.methods.Register(username).send({from:account});
+ alert("Registered successfully");
 }
 
-async function purchase() {
-  const ref1 = prompt("Ref 1 username:");
-  const ref2 = prompt("Ref 2 username:");
-
-  const value = await getBNBAmount(10);
-  const tx = await contract.Purchase(ref1 || "", ref2 || "", { value });
-  document.getElementById("status").innerText = "Purchase tx sent...";
-  await tx.wait();
-  document.getElementById("status").innerText = "Purchase successful 🚀";
+async function purchase(){
+ const r1=document.getElementById('ref1').value;
+ const r2=document.getElementById('ref2').value;
+ await approveUSDT("10");
+ const c=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
+ await c.methods.Purchase(r1,r2).send({from:account});
+ alert("Purchase successful");
 }
 </script>
 
