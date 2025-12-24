@@ -3,207 +3,197 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NOVA Space UI</title>
 
-<!-- فونت ساده و فضایی -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<title>NOVA | The Future of Web3</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Vazirmatn:wght@300;500&display=swap" rel="stylesheet">
+
+<!-- Ethers v5 -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --bg: #050b1a;
+  --card: #0b1633;
+  --accent: #00eaff;
+  --text: #ffffff;
+  --muted: #9aa4c7;
 }
 
-html, body {
-  height: 100%;
-  font-family: 'Inter', sans-serif;
-  background: #000;
-  color: #bfefff;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Orbitron", "Vazirmatn", sans-serif;
+  background: radial-gradient(circle at top, #0b1c3d, #050b1a);
+  color: var(--text);
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* ===== Canvas Background ===== */
-#space {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-}
-
-/* ===== Nebula overlay ===== */
-.nebula {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(0,120,255,.15), transparent 40%),
-    radial-gradient(circle at 70% 80%, rgba(0,255,200,.12), transparent 45%);
-  z-index: -1;
-}
-
-/* ===== Header ===== */
 header {
-  padding: 16px 20px;
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .logo {
-  letter-spacing: 4px;
-  font-size: 12px;
-  opacity: .8;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--accent);
 }
 
-/* ===== Buttons ===== */
-.btn {
-  padding: 8px 14px;
-  font-size: 12px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #1ecbff, #4da3ff);
-  color: #001018;
+button {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
   border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0,234,255,.4);
+  transition: 0.3s;
 }
 
-/* ===== Main ===== */
-main {
-  padding: 40px 20px 120px;
+button:hover {
+  transform: scale(1.05);
 }
 
-h1 {
-  font-size: 20px;
-  font-weight: 400;
-  margin-bottom: 6px;
+.hero {
+  text-align: center;
+  padding: 100px 20px 40px;
 }
 
-.sub {
-  font-size: 11px;
-  opacity: .6;
-  margin-bottom: 30px;
+.hero h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
 }
 
-/* ===== Card ===== */
+.hero p {
+  max-width: 520px;
+  margin: auto;
+  color: var(--muted);
+}
+
 .card {
-  background: rgba(10,20,40,.65);
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 30px rgba(0,150,255,.08);
+  background: linear-gradient(180deg, #0b1633, #070e22);
+  margin: 40px auto;
+  padding: 30px;
+  max-width: 700px;
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,0,0,.6);
 }
 
-.card h2 {
-  font-size: 13px;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-/* ===== Planet (Moon) ===== */
-.planet-wrap {
-  display: flex;
-  justify-content: center;
-  margin: 40px 0;
-}
-
-.planet {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ddd, #777 55%, #333 75%);
-  box-shadow:
-    inset -20px -20px 40px rgba(0,0,0,.6),
-    0 0 40px rgba(150,200,255,.25);
-  animation: spin 18s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ===== Scroll fix ===== */
-body {
-  overflow-y: auto;
+.status {
+  margin-top: 15px;
+  font-size: 14px;
+  word-break: break-all;
+  color: var(--muted);
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="space"></canvas>
-<div class="nebula"></div>
-
 <header>
   <div class="logo">NOVA</div>
-  <div>
-    <button class="btn">Connect</button>
-    <button class="btn">Sign</button>
-  </div>
+  <button onclick="connectWallet()">Connect Wallet</button>
 </header>
 
-<main>
-  <h1>Web3 Dashboard</h1>
-  <div class="sub">Galactic UI · Dark Space Theme</div>
+<section class="hero">
+  <h1>The Future of Web3</h1>
+  <p>
+    NOVA is a decentralized galaxy-powered platform combining Web3, AI
+    structures and next-generation blockchain experiences.
+  </p>
+</section>
 
-  <div class="planet-wrap">
-    <div class="planet"></div>
-  </div>
+<div class="card">
+  <button onclick="signWallet()">Sign Wallet</button>
 
-  <div class="card">
-    <h2>Dashboard</h2>
-    Wallet: —<br/>
-    Users: —
-  </div>
-
-  <div class="card">
-    <h2>Register</h2>
-    <button class="btn">Register</button>
-  </div>
-
-  <div class="card">
-    <h2>Purchase</h2>
-    <button class="btn">Buy</button>
-  </div>
-</main>
+  <div class="status" id="walletStatus">Wallet: Not connected</div>
+  <div class="status" id="signatureStatus">Signature: -</div>
+  <div class="status" id="userCount">User Count: 41</div>
+</div>
 
 <script>
-/* ===== Starfield Canvas ===== */
-const canvas = document.getElementById('space');
-const ctx = canvas.getContext('2d');
+let provider;
+let signer;
+let currentAccount;
 
-let w, h;
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
-
-const stars = Array.from({ length: 180 }, () => ({
-  x: Math.random() * w,
-  y: Math.random() * h,
-  z: Math.random() * 1.5 + 0.2
-}));
-
-function draw() {
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#fff';
-
-  for (let s of stars) {
-    ctx.globalAlpha = s.z;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.z * 1.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    s.y += s.z * 0.3;
-    if (s.y > h) {
-      s.y = 0;
-      s.x = Math.random() * w;
-    }
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert("Wallet not detected. Use MetaMask or SafePal browser.");
+    return;
   }
 
-  requestAnimationFrame(draw);
+  try {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
+    currentAccount = await signer.getAddress();
+
+    document.getElementById("walletStatus").innerText =
+      "Wallet: " + currentAccount;
+
+    await switchToBSC();
+
+  } catch (err) {
+    alert("Connection failed");
+    console.error(err);
+  }
 }
-draw();
+
+async function switchToBSC() {
+  const bscChainId = "0x38";
+
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: bscChainId }]
+    });
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: bscChainId,
+          chainName: "Binance Smart Chain",
+          rpcUrls: ["https://bsc-dataseed.binance.org/"],
+          nativeCurrency: {
+            name: "BNB",
+            symbol: "BNB",
+            decimals: 18
+          },
+          blockExplorerUrls: ["https://bscscan.com"]
+        }]
+      });
+    }
+  }
+}
+
+async function signWallet() {
+  if (!signer) {
+    alert("Connect wallet first");
+    return;
+  }
+
+  try {
+    const message = "NOVA AUTH SIGNATURE";
+    const signature = await signer.signMessage(message);
+
+    document.getElementById("signatureStatus").innerText =
+      "Signature: " + signature;
+
+  } catch (err) {
+    alert("Signature rejected");
+  }
+}
 </script>
 
 </body>
